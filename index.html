@@ -400,7 +400,6 @@
     border-radius: 2px;
     padding: 0.35rem;
     gap: 0.5rem;
-    animation: fadeUp 0.3s ease;
   }
 
   .cantidad-btn {
@@ -1222,13 +1221,14 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .producto-card { animation: fadeUp 0.6s ease backwards; }
-  .producto-card:nth-child(1) { animation-delay: 0.05s; }
-  .producto-card:nth-child(2) { animation-delay: 0.1s; }
-  .producto-card:nth-child(3) { animation-delay: 0.15s; }
-  .producto-card:nth-child(4) { animation-delay: 0.2s; }
-  .producto-card:nth-child(5) { animation-delay: 0.25s; }
-  .producto-card:nth-child(6) { animation-delay: 0.3s; }
+  /* La animación solo se aplica en la primera carga, con la clase .first-load */
+  .first-load .producto-card { animation: fadeUp 0.6s ease backwards; }
+  .first-load .producto-card:nth-child(1) { animation-delay: 0.05s; }
+  .first-load .producto-card:nth-child(2) { animation-delay: 0.1s; }
+  .first-load .producto-card:nth-child(3) { animation-delay: 0.15s; }
+  .first-load .producto-card:nth-child(4) { animation-delay: 0.2s; }
+  .first-load .producto-card:nth-child(5) { animation-delay: 0.25s; }
+  .first-load .producto-card:nth-child(6) { animation-delay: 0.3s; }
 
   /* Responsive */
   @media (max-width: 768px) {
@@ -1865,6 +1865,12 @@ function renderFiltros() {
 // ===== RENDER PRODUCTOS =====
 function renderProductos() {
   const cont = document.getElementById('productos');
+
+  // Añadir clase de animación para esta tanda (se remueve después)
+  cont.classList.add('first-load');
+  // Remover después de la animación para que futuros cambios no disparen animación
+  setTimeout(() => cont.classList.remove('first-load'), 700);
+
   let lista = state.productos;
 
   if (state.categoriaActiva !== 'Todo') {
@@ -1903,7 +1909,7 @@ function renderProductos() {
       : `<button class="btn-agregar" data-add="${p.id}">Agregar al carrito</button>`;
 
     return `
-      <article class="producto-card">
+      <article class="producto-card" data-producto-id="${p.id}">
         <div class="producto-imagen">
           <span class="categoria-tag">${escapeHtml(p.categoria)}</span>
           ${imgHtml}
@@ -1915,7 +1921,7 @@ function renderProductos() {
             <div class="precio-principal">${fmtUSD(p.precio)}</div>
             <div class="precio-secundario">${fmtCOP(p.precio)} · ${fmtVES(p.precio)}</div>
           </div>
-          ${controlHtml}
+          <div class="producto-control-wrap">${controlHtml}</div>
         </div>
       </article>
     `;
@@ -1932,10 +1938,45 @@ function renderProductos() {
   });
 }
 
+// Actualiza solo la tarjeta del producto específico, sin re-renderizar toda la lista
+function actualizarControlProducto(id) {
+  const cont = document.getElementById('productos');
+  if (!cont) return;
+  const card = cont.querySelector(`[data-producto-id="${id}"]`);
+  if (!card) return;
+
+  const contenedor = card.querySelector('.producto-control-wrap');
+  if (!contenedor) return;
+
+  const cantidad = state.carrito[id] || 0;
+  if (cantidad > 0) {
+    contenedor.innerHTML = `
+      <div class="cantidad-control">
+        <button class="cantidad-btn" data-minus="${id}" aria-label="Disminuir cantidad">−</button>
+        <div class="cantidad-display">
+          <span>${cantidad}</span>
+          <span class="cantidad-display-label">en carrito</span>
+        </div>
+        <button class="cantidad-btn" data-plus="${id}" aria-label="Aumentar cantidad">+</button>
+      </div>
+    `;
+  } else {
+    contenedor.innerHTML = `<button class="btn-agregar" data-add="${id}">Agregar al carrito</button>`;
+  }
+
+  // Re-adjuntar listeners solo al contenedor modificado
+  const btnAdd = contenedor.querySelector('[data-add]');
+  if (btnAdd) btnAdd.onclick = () => agregarAlCarrito(parseInt(btnAdd.dataset.add));
+  const btnPlus = contenedor.querySelector('[data-plus]');
+  if (btnPlus) btnPlus.onclick = () => cambiarCantidad(parseInt(btnPlus.dataset.plus), 1);
+  const btnMinus = contenedor.querySelector('[data-minus]');
+  if (btnMinus) btnMinus.onclick = () => cambiarCantidad(parseInt(btnMinus.dataset.minus), -1);
+}
+
 // ===== CARRITO =====
 function agregarAlCarrito(id) {
   state.carrito[id] = (state.carrito[id] || 0) + 1;
-  renderProductos();
+  actualizarControlProducto(id);
   actualizarCarrito();
   const p = state.productos.find(x => x.id === id);
   mostrarToast(`✨ ${p.nombre} agregado al carrito`);
@@ -1948,13 +1989,13 @@ function cambiarCantidad(id, delta) {
   } else {
     state.carrito[id] = nueva;
   }
-  renderProductos();
+  actualizarControlProducto(id);
   actualizarCarrito();
 }
 
 function eliminarDelCarrito(id) {
   delete state.carrito[id];
-  renderProductos();
+  actualizarControlProducto(id);
   actualizarCarrito();
 }
 
