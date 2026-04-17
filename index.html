@@ -323,6 +323,7 @@
     justify-content: center;
     overflow: hidden;
     position: relative;
+    cursor: zoom-in;
   }
 
   .producto-imagen img {
@@ -1234,6 +1235,210 @@
     box-shadow: var(--sombra-dorada);
   }
 
+  /* ============================================
+     Lightbox de imágenes de producto
+     ============================================ */
+  .lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    padding: 2rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: zoom-out;
+  }
+
+  .lightbox-overlay.open {
+    display: flex;
+    opacity: 1;
+  }
+
+  .lightbox-contenido {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    cursor: default;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .lightbox-overlay.open .lightbox-contenido {
+    transform: scale(1);
+  }
+
+  .lightbox-imagen {
+    max-width: 85vw;
+    max-height: 75vh;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    background: var(--negro-suave);
+  }
+
+  .lightbox-info {
+    text-align: center;
+    max-width: 85vw;
+    padding: 0 1rem;
+  }
+
+  .lightbox-nombre {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--blanco-marfil);
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.02em;
+  }
+
+  .lightbox-precio {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--dorado-claro);
+    font-weight: 500;
+  }
+
+  .lightbox-separador {
+    color: var(--dorado);
+    margin: 0 0.5rem;
+    opacity: 0.6;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(10, 10, 10, 0.7);
+    border: 1px solid var(--gris-borde);
+    color: var(--blanco-marfil);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(6px);
+    z-index: 2;
+  }
+
+  .lightbox-close:hover {
+    background: var(--dorado);
+    color: var(--negro);
+    border-color: var(--dorado);
+    transform: scale(1.08);
+  }
+
+  @media (max-width: 768px) {
+    .lightbox-overlay { padding: 1rem; }
+    .lightbox-imagen {
+      max-width: 92vw;
+      max-height: 65vh;
+    }
+    .lightbox-nombre { font-size: 1.1rem; }
+    .lightbox-precio { font-size: 0.9rem; }
+    .lightbox-close {
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  /* ============================================
+     Botón flotante de WhatsApp directo (esquina inf. derecha)
+     ============================================ */
+  .btn-whatsapp-flotante {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 99;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #25D366;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 24px -6px rgba(37, 211, 102, 0.55),
+      0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    text-decoration: none;
+    color: white;
+  }
+
+  .btn-whatsapp-flotante:hover {
+    transform: scale(1.08);
+    box-shadow:
+      0 12px 30px -4px rgba(37, 211, 102, 0.7),
+      0 6px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .btn-whatsapp-flotante:active {
+    transform: scale(0.96);
+  }
+
+  .btn-whatsapp-flotante svg {
+    width: 32px;
+    height: 32px;
+    fill: white;
+  }
+
+  /* Pulso dorado sutil para llamar la atención */
+  .btn-whatsapp-flotante::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(201, 162, 77, 0.6);
+    animation: pulso-whatsapp 2.2s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes pulso-whatsapp {
+    0%   { transform: scale(1);    opacity: 0.7; }
+    80%  { transform: scale(1.45); opacity: 0;   }
+    100% { transform: scale(1.45); opacity: 0;   }
+  }
+
+  /* Tooltip "Chatea con nosotras" (solo desktop) */
+  .btn-whatsapp-flotante .tooltip-wa {
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--negro-suave);
+    color: var(--dorado-claro);
+    border: 1px solid var(--gris-borde);
+    padding: 0.5rem 0.85rem;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .btn-whatsapp-flotante:hover .tooltip-wa {
+    opacity: 1;
+    transform: translateY(-50%) translateX(-2px);
+  }
+
   @media (max-width: 768px) {
     .como-comprar-titulo { font-size: 2rem; }
     .como-comprar-header { padding: 1.5rem 1.25rem 0.75rem; }
@@ -1247,6 +1452,18 @@
       padding: 0.6rem 0.9rem;
       font-size: 0.75rem;
     }
+    .btn-whatsapp-flotante {
+      width: 52px;
+      height: 52px;
+      bottom: 1rem;
+      right: 1rem;
+    }
+    .btn-whatsapp-flotante svg {
+      width: 28px;
+      height: 28px;
+    }
+    /* El tooltip no tiene sentido en móvil (no hay hover) */
+    .btn-whatsapp-flotante .tooltip-wa { display: none; }
   }
 
   /* Animations */
@@ -1539,6 +1756,26 @@
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
   ¿Cómo comprar?
 </button>
+
+<!-- Botón flotante de WhatsApp directo -->
+<a class="btn-whatsapp-flotante" id="btnWhatsappFlotante" href="#" target="_blank" rel="noopener" aria-label="Chatear por WhatsApp">
+  <span class="tooltip-wa">Chatea con nosotras</span>
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.002-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<!-- Lightbox de imágenes de producto -->
+<div class="lightbox-overlay" id="lightboxOverlay" role="dialog" aria-label="Imagen ampliada">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar imagen">×</button>
+  <div class="lightbox-contenido">
+    <img class="lightbox-imagen" id="lightboxImg" src="" alt="">
+    <div class="lightbox-info">
+      <div class="lightbox-nombre" id="lightboxNombre"></div>
+      <div class="lightbox-precio" id="lightboxPrecio"></div>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1970,6 +2207,15 @@ function renderProductos() {
   cont.querySelectorAll('[data-minus]').forEach(btn => {
     btn.onclick = () => cambiarCantidad(parseInt(btn.dataset.minus), -1);
   });
+  // Click en la imagen → abrir lightbox (solo si el producto tiene imagen)
+  cont.querySelectorAll('.producto-imagen').forEach(div => {
+    div.onclick = () => {
+      const card = div.closest('.producto-card');
+      const id = parseInt(card.dataset.productoId);
+      const prod = state.productos.find(p => p.id === id);
+      if (prod && prod.imagen) abrirLightbox(prod);
+    };
+  });
 }
 
 // Actualiza solo la tarjeta del producto específico, sin re-renderizar toda la lista
@@ -2288,6 +2534,7 @@ async function guardarConfig() {
   guardarDatos();
   renderProductos();
   actualizarCarrito();
+  actualizarBtnWhatsapp();
   mostrarToast('Configuración guardada ✨');
 }
 
@@ -2381,6 +2628,7 @@ document.addEventListener('keydown', (e) => {
     cerrarCarrito();
     cerrarAdmin();
     cerrarComoComprar();
+    cerrarLightbox();
   }
 });
 
@@ -2394,6 +2642,47 @@ document.getElementById('comoComprarOverlay').onclick = (e) => {
     cerrarComoComprar();
   }
 };
+
+// ===== LIGHTBOX DE IMÁGENES =====
+function abrirLightbox(producto) {
+  const overlay = document.getElementById('lightboxOverlay');
+  const img = document.getElementById('lightboxImg');
+  const nombre = document.getElementById('lightboxNombre');
+  const precio = document.getElementById('lightboxPrecio');
+
+  img.src = producto.imagen;
+  img.alt = producto.nombre;
+  nombre.textContent = producto.nombre;
+  precio.innerHTML = `${fmtUSD(producto.precio)}<span class="lightbox-separador">·</span>${fmtCOP(producto.precio)}<span class="lightbox-separador">·</span>${fmtVES(producto.precio)}`;
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden'; // bloquear scroll del fondo
+}
+
+function cerrarLightbox() {
+  const overlay = document.getElementById('lightboxOverlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow = ''; // restaurar scroll
+}
+
+document.getElementById('lightboxClose').onclick = cerrarLightbox;
+document.getElementById('lightboxOverlay').onclick = (e) => {
+  // Cerrar si se hace clic en el fondo (overlay), no en el contenido
+  if (e.target === document.getElementById('lightboxOverlay')) {
+    cerrarLightbox();
+  }
+};
+
+// ===== Botón flotante de WhatsApp directo =====
+// Mensaje pre-llenado para consultas rápidas (independiente del mensaje del carrito)
+const MENSAJE_CONSULTA_WA = 'Hola, quisiera más información sobre sus productos 💄';
+
+function actualizarBtnWhatsapp() {
+  const btn = document.getElementById('btnWhatsappFlotante');
+  if (!btn) return;
+  const numero = (state.config.whatsapp || '').replace(/\D/g, '');
+  btn.href = `https://wa.me/${numero}?text=${encodeURIComponent(MENSAJE_CONSULTA_WA)}`;
+}
 
 // ===== MODAL CÓMO COMPRAR =====
 const COMO_COMPRAR_KEY = 'bellas_como_comprar_visto';
@@ -2469,6 +2758,9 @@ async function init() {
     // Solo mostrar el modal "Cómo comprar" si NO es el admin entrando
     mostrarComoComprarSiPrimeraVez();
   }
+
+  // Inicializar el link del botón flotante de WhatsApp
+  actualizarBtnWhatsapp();
 }
 
 // Escuchar cambios de hash para activar admin sin recargar
