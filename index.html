@@ -1255,6 +1255,114 @@
     z-index: 1;
   }
 
+  /* ============================================
+     Sección de métodos de pago (antes del footer)
+     ============================================ */
+  .metodos-pago {
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .metodos-pago-titulo {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    color: var(--dorado-claro);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.5rem;
+  }
+
+  .metodos-pago-divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--dorado), transparent);
+    margin: 0 auto 2rem;
+  }
+
+  .metodos-pago-grid {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 1rem;
+    max-width: 900px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .metodo-pago-chip {
+    flex: 1 1 140px;
+    max-width: 170px;
+    min-height: 110px;
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid var(--gris-borde);
+    border-radius: 12px;
+    padding: 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: all 0.3s ease;
+  }
+
+  .metodo-pago-chip:hover {
+    border-color: var(--dorado);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px -10px rgba(201, 162, 77, 0.4);
+  }
+
+  .metodo-pago-icono {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .metodo-pago-icono svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .metodo-pago-nombre {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--blanco-marfil);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .metodos-pago-nota {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.88rem;
+    color: rgba(250, 246, 238, 0.6);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 768px) {
+    .metodos-pago { padding: 2rem 1rem 1.5rem; }
+    .metodos-pago-titulo { font-size: 1.35rem; }
+    .metodos-pago-grid { gap: 0.6rem; }
+    .metodo-pago-chip {
+      flex: 1 1 calc(50% - 0.6rem);
+      max-width: none;
+      min-height: 95px;
+      padding: 0.85rem 0.5rem;
+    }
+    .metodo-pago-icono { width: 36px; height: 36px; }
+    .metodo-pago-nombre { font-size: 0.72rem; }
+    .metodos-pago-nota { font-size: 0.82rem; }
+  }
+
   .footer-content {
     max-width: 600px;
     margin: 0 auto;
@@ -2092,6 +2200,89 @@
     </div>
   </div>
 </div>
+
+<!-- Sección de métodos de pago -->
+<section class="metodos-pago">
+  <h2 class="metodos-pago-titulo">Métodos de pago</h2>
+  <div class="metodos-pago-divider"></div>
+
+  <div class="metodos-pago-grid">
+
+    <!-- Efectivo -->
+    <div class="metodo-pago-chip">
+      <div class="metodo-pago-icono">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="6" y="16" width="52" height="32" rx="3" fill="#2e7d32" stroke="#1b5e20" stroke-width="1.5"/>
+          <rect x="10" y="20" width="44" height="24" rx="2" fill="none" stroke="#e8c474" stroke-width="1"/>
+          <circle cx="32" cy="32" r="7" fill="none" stroke="#e8c474" stroke-width="1.5"/>
+          <text x="32" y="36" text-anchor="middle" font-family="serif" font-size="10" font-weight="bold" fill="#e8c474">$</text>
+          <circle cx="14" cy="24" r="1.5" fill="#e8c474"/>
+          <circle cx="50" cy="40" r="1.5" fill="#e8c474"/>
+        </svg>
+      </div>
+      <div class="metodo-pago-nombre">Efectivo</div>
+    </div>
+
+    <!-- Pago Móvil (Bs) -->
+    <div class="metodo-pago-chip">
+      <div class="metodo-pago-icono">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="18" y="6" width="28" height="52" rx="4" fill="#1565c0" stroke="#0d47a1" stroke-width="1.5"/>
+          <rect x="21" y="11" width="22" height="34" rx="1" fill="#faf6ee"/>
+          <circle cx="32" cy="52" r="2" fill="#faf6ee"/>
+          <text x="32" y="32" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1565c0">Bs</text>
+          <path d="M 27 18 Q 32 16 37 18" stroke="#1565c0" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <path d="M 29 21 Q 32 20 35 21" stroke="#1565c0" stroke-width="1" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="metodo-pago-nombre">Pago Móvil (Bs)</div>
+    </div>
+
+    <!-- Binance -->
+    <div class="metodo-pago-chip">
+      <div class="metodo-pago-icono">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="32" cy="32" r="30" fill="#F3BA2F"/>
+          <g fill="#181A20">
+            <path d="M 21 32 L 25.5 27.5 L 30 32 L 25.5 36.5 Z"/>
+            <path d="M 34 32 L 38.5 27.5 L 43 32 L 38.5 36.5 Z"/>
+            <path d="M 27.5 25.5 L 32 21 L 36.5 25.5 L 32 30 Z"/>
+            <path d="M 27.5 38.5 L 32 34 L 36.5 38.5 L 32 43 Z"/>
+          </g>
+        </svg>
+      </div>
+      <div class="metodo-pago-nombre">Binance</div>
+    </div>
+
+    <!-- Zinli -->
+    <div class="metodo-pago-chip">
+      <div class="metodo-pago-icono">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="2" y="2" width="60" height="60" rx="14" fill="#1E5AFF"/>
+          <text x="32" y="42" text-anchor="middle" font-family="'Inter', sans-serif" font-size="30" font-weight="700" fill="#ffffff">z</text>
+          <circle cx="42" cy="20" r="2.5" fill="#ffffff"/>
+        </svg>
+      </div>
+      <div class="metodo-pago-nombre">Zinli</div>
+    </div>
+
+    <!-- Bancolombia -->
+    <div class="metodo-pago-chip">
+      <div class="metodo-pago-icono">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="2" y="2" width="60" height="60" rx="10" fill="#FDDA24"/>
+          <text x="32" y="44" text-anchor="middle" font-family="'Inter', sans-serif" font-size="38" font-weight="800" fill="#2C2A29" font-style="italic">B</text>
+        </svg>
+      </div>
+      <div class="metodo-pago-nombre">Bancolombia</div>
+    </div>
+
+  </div>
+
+  <p class="metodos-pago-nota">
+    Coordinamos el método de pago por WhatsApp al confirmar tu pedido ✨
+  </p>
+</section>
 
 <footer>
   <div class="footer-content">
