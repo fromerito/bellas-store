@@ -1099,10 +1099,10 @@
 
       <div class="tab-panel" id="tabConfig">
         <div class="form-group">
-          <label>URL del Google Sheet (CSV publicado)</label>
-          <input type="text" id="confSheetUrl" placeholder="https://docs.google.com/spreadsheets/.../pub?output=csv">
+          <label>Google Sheet conectado</label>
+          <input type="text" id="confSheetUrl" readonly style="opacity:0.7; cursor:not-allowed;">
           <small style="display:block; margin-top:0.4rem; color:rgba(250,246,238,0.5); font-size:0.75rem; line-height:1.5;">
-            Ver instrucciones al final de esta pestaña 👇
+            📎 Esta URL está fija en el código del sitio. Para cambiarla hay que editar el archivo HTML. Para editar los productos usa Google Sheets directamente.
           </small>
         </div>
         <div class="form-group">
@@ -1129,17 +1129,9 @@
         </div>
 
         <div style="margin-top:2rem; padding-top:1.5rem; border-top: 1px solid var(--gris-borde);">
-          <h3 style="font-family: var(--font-serif); color: var(--dorado-claro); margin-bottom: 0.75rem; font-size: 1.2rem;">📋 Cómo conectar Google Sheets</h3>
-          <ol style="color: rgba(250,246,238,0.7); font-size: 0.85rem; line-height: 1.7; padding-left: 1.2rem;">
-            <li>Crea una hoja en <a href="https://sheets.google.com" target="_blank" style="color:var(--dorado-claro);">Google Sheets</a> con estas columnas en la fila 1: <br><code style="color:var(--dorado-claro);">nombre | descripcion | categoria | precio | imagen</code></li>
-            <li>Agrega tus productos. El <b>precio</b> debe estar en USD (solo números, ej: <code>8.50</code>). La <b>imagen</b> es opcional (URL pública).</li>
-            <li>Ve a <b>Archivo → Compartir → Publicar en la web</b></li>
-            <li>En el cuadro que aparece, elige la pestaña <b>Vínculo</b>, selecciona <b>Valores separados por comas (.csv)</b> y click en <b>Publicar</b></li>
-            <li>Copia la URL que te da y pégala arriba</li>
-            <li>Click en "Guardar configuración" y luego "🔄 Recargar desde Sheet"</li>
-          </ol>
-          <p style="margin-top:1rem; color: rgba(250,246,238,0.5); font-size: 0.75rem;">
-            💡 Tip: Los cambios en Sheets tardan ~5 minutos en propagarse por Google. Si no ves los cambios al instante, espera un poco y recarga.
+          <h3 style="font-family: var(--font-serif); color: var(--dorado-claro); margin-bottom: 0.75rem; font-size: 1.2rem;">✨ Cómo editar los productos</h3>
+          <p style="color: rgba(250,246,238,0.7); font-size: 0.85rem; line-height: 1.6;">
+            Los productos se editan directamente en tu Google Sheet. Abre la hoja desde tu celular o PC, agrega/modifica/elimina filas, guarda los cambios y espera ~5 min para que Google los propague. Luego usa el botón <b>"🔄 Recargar desde Sheet"</b> arriba para ver los cambios al instante.
           </p>
         </div>
 
@@ -1188,7 +1180,7 @@ const STORAGE_KEY = 'bellas_data_v1';
 
 const defaultData = {
   config: {
-    sheetUrl: '',
+    sheetUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFxe-eBox6aa3W7n-ZbY4NDGq5y9RYuM1YpPnRfbkzcIL_lDpvEj9zico2LnYAqfUcbgj-_1m8TfKf/pub?gid=0&single=true&output=csv',
     whatsapp: '584120664059',
     tasaCOP: 4000,
     tasaVES: 479.77,
@@ -1297,6 +1289,9 @@ function cargarDatos() {
     state.config = { ...defaultData.config };
     state.productos = [...defaultData.productos];
   }
+  // La URL del Sheet SIEMPRE viene del código, no del navegador del usuario.
+  // Así todos ven la misma fuente de datos sin importar su dispositivo.
+  state.config.sheetUrl = defaultData.config.sheetUrl;
 }
 
 function guardarDatos() {
@@ -1862,35 +1857,14 @@ function cargarConfigEnForm() {
 }
 
 async function guardarConfig() {
-  const nuevoSheetUrl = document.getElementById('confSheetUrl').value.trim();
-  const sheetCambio = nuevoSheetUrl !== state.config.sheetUrl;
-
-  state.config.sheetUrl = nuevoSheetUrl;
   state.config.whatsapp = document.getElementById('confWhatsapp').value.trim().replace(/\D/g, '');
   state.config.tasaCOP = parseFloat(document.getElementById('confTasaCOP').value) || 0;
   state.config.tasaVES = parseFloat(document.getElementById('confTasaVES').value) || 0;
   state.config.mensaje = document.getElementById('confMensaje').value.trim() || defaultData.config.mensaje;
   guardarDatos();
-
-  // Si cambió el sheet, intentar cargar inmediatamente
-  if (sheetCambio && nuevoSheetUrl) {
-    mostrarToast('Configuración guardada. Cargando Sheet...');
-    const ok = await cargarProductosDesdeSheet(true);
-    if (ok) {
-      renderFiltros();
-      renderProductos();
-      actualizarCarrito();
-      renderAdminProductos();
-      mostrarToast('✨ Productos cargados del Sheet');
-    } else {
-      renderAdminProductos();
-      mostrarToast('⚠️ No se pudo cargar el Sheet. Revisa la URL.');
-    }
-  } else {
-    renderProductos();
-    actualizarCarrito();
-    mostrarToast('Configuración guardada ✨');
-  }
+  renderProductos();
+  actualizarCarrito();
+  mostrarToast('Configuración guardada ✨');
 }
 
 // Export / Import
