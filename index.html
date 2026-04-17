@@ -254,6 +254,218 @@
     font-weight: 600;
   }
 
+  /* ============================================
+     Botón compartir producto (esquina sup. derecha de la tarjeta)
+     ============================================ */
+  .btn-compartir {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(10, 10, 10, 0.75);
+    border: 1px solid var(--gris-borde);
+    color: var(--dorado-claro);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+    z-index: 3;
+  }
+
+  .btn-compartir:hover {
+    background: var(--dorado);
+    color: var(--negro);
+    border-color: var(--dorado);
+    transform: scale(1.08);
+  }
+
+  .btn-compartir svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* Si la tarjeta tiene cinta de estado (agotado/próximamente),
+     empujar el botón compartir hacia abajo para que no se solape */
+  .producto-card:has(.estado-cinta) .btn-compartir {
+    top: 3.1rem;
+  }
+
+  /* ============================================
+     Filtro por rango de precio (slider dual)
+     ============================================ */
+  .precio-filtro {
+    max-width: 500px;
+    margin: 0 auto 2rem;
+    padding: 1rem 1.5rem;
+    background: rgba(20, 20, 20, 0.5);
+    border: 1px solid var(--gris-borde);
+    border-radius: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .precio-filtro-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.85rem;
+    gap: 0.75rem;
+  }
+
+  .precio-filtro-label {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    color: var(--dorado-claro);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .precio-filtro-valores {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--blanco-marfil);
+    font-weight: 500;
+  }
+
+  .precio-filtro-valores .separador {
+    color: var(--dorado);
+    margin: 0 0.4rem;
+    opacity: 0.5;
+  }
+
+  .precio-filtro-limpiar {
+    background: transparent;
+    border: 1px solid var(--gris-borde);
+    color: var(--blanco-marfil);
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.05em;
+  }
+
+  .precio-filtro-limpiar:hover {
+    border-color: var(--dorado);
+    color: var(--dorado-claro);
+  }
+
+  .precio-filtro-limpiar.oculto { display: none; }
+
+  /* Contenedor del slider dual */
+  .precio-slider-wrap {
+    position: relative;
+    height: 32px;
+    padding: 10px 0;
+  }
+
+  /* Pista de fondo */
+  .precio-slider-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(201, 162, 77, 0.15);
+    border-radius: 2px;
+    transform: translateY(-50%);
+  }
+
+  /* Pista activa (entre los dos handles, coloreada de dorado) */
+  .precio-slider-rango {
+    position: absolute;
+    top: 50%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--dorado) 0%, var(--dorado-claro) 100%);
+    border-radius: 2px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  /* Los dos inputs range superpuestos */
+  .precio-slider-wrap input[type="range"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 32px;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: none; /* solo el thumb recibe clicks */
+    margin: 0;
+  }
+
+  /* Thumb de WebKit (Chrome, Safari, Edge modernos) */
+  .precio-slider-wrap input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--dorado);
+    border: 2px solid var(--negro);
+    box-shadow: 0 2px 8px rgba(201, 162, 77, 0.5);
+    cursor: grab;
+    pointer-events: auto;
+    margin-top: 0;
+    transition: transform 0.15s ease;
+  }
+  .precio-slider-wrap input[type="range"]::-webkit-slider-thumb:hover,
+  .precio-slider-wrap input[type="range"]::-webkit-slider-thumb:active {
+    transform: scale(1.2);
+    background: var(--dorado-claro);
+    cursor: grabbing;
+  }
+
+  /* Thumb de Firefox */
+  .precio-slider-wrap input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--dorado);
+    border: 2px solid var(--negro);
+    box-shadow: 0 2px 8px rgba(201, 162, 77, 0.5);
+    cursor: grab;
+    pointer-events: auto;
+    transition: transform 0.15s ease;
+  }
+  .precio-slider-wrap input[type="range"]::-moz-range-thumb:hover,
+  .precio-slider-wrap input[type="range"]::-moz-range-thumb:active {
+    transform: scale(1.2);
+    background: var(--dorado-claro);
+    cursor: grabbing;
+  }
+
+  /* Quitar tracks por defecto de los inputs (usamos el nuestro) */
+  .precio-slider-wrap input[type="range"]::-webkit-slider-runnable-track {
+    background: transparent;
+    border: none;
+  }
+  .precio-slider-wrap input[type="range"]::-moz-range-track {
+    background: transparent;
+    border: none;
+  }
+
+  @media (max-width: 768px) {
+    .precio-filtro { padding: 0.85rem 1.1rem; margin: 0 1rem 1.5rem; }
+    .precio-filtro-valores { font-size: 0.85rem; }
+    /* Thumbs más grandes en móvil para facilitar el toque */
+    .precio-slider-wrap input[type="range"]::-webkit-slider-thumb {
+      width: 24px;
+      height: 24px;
+    }
+    .precio-slider-wrap input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
   /* Search */
   .search-bar {
     max-width: 500px;
@@ -357,6 +569,89 @@
     letter-spacing: 0.08em;
     backdrop-filter: blur(8px);
     border: 1px solid var(--gris-borde);
+  }
+
+  /* ============================================
+     Estados de producto: agotado / proximamente / destacado
+     ============================================ */
+
+  /* Producto agotado: toda la tarjeta queda apagada */
+  .producto-card.agotado .producto-imagen img,
+  .producto-card.agotado .producto-imagen-placeholder,
+  .producto-card.agotado .producto-info {
+    opacity: 0.5;
+    filter: grayscale(40%);
+  }
+  .producto-card.agotado .producto-imagen {
+    cursor: zoom-in; /* sí permite lightbox */
+  }
+  .producto-card.agotado:hover .producto-imagen img {
+    transform: none; /* deshabilitar el zoom de hover */
+  }
+
+  /* Producto próximamente: se ve normal, solo con cinta */
+  .producto-card.proximamente .producto-imagen img {
+    filter: saturate(0.85);
+  }
+
+  /* Cinta de estado (agotado / próximamente) — esquina superior derecha */
+  .estado-cinta {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+    z-index: 3;
+  }
+
+  .estado-cinta.cinta-agotado {
+    background: rgba(20, 20, 20, 0.9);
+    color: #d4d4d4;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .estado-cinta.cinta-proximamente {
+    background: rgba(201, 162, 77, 0.15);
+    color: var(--dorado-claro);
+    border: 1px solid var(--dorado);
+  }
+
+  /* Cinta de DESTACADO — esquina superior izquierda, encima del categoria-tag */
+  .cinta-destacado {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background: linear-gradient(135deg, var(--dorado) 0%, var(--dorado-claro) 100%);
+    color: var(--negro);
+    padding: 0.35rem 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 999px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    box-shadow: 0 4px 12px rgba(201, 162, 77, 0.35);
+    animation: brillo-destacado 3s ease-in-out infinite;
+  }
+
+  @keyframes brillo-destacado {
+    0%, 100% { box-shadow: 0 4px 12px rgba(201, 162, 77, 0.35); }
+    50%      { box-shadow: 0 4px 20px rgba(232, 196, 116, 0.65); }
+  }
+
+  /* Cuando hay destacado, empujar el categoria-tag hacia abajo para que no se solapen */
+  .producto-card.destacado .categoria-tag {
+    top: 3rem;
   }
 
   .producto-info {
@@ -1356,6 +1651,107 @@
   }
 
   /* ============================================
+     Carrusel del lightbox (múltiples imágenes)
+     ============================================ */
+
+  /* Flechas de navegación del lightbox */
+  .lightbox-flecha {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(10, 10, 10, 0.7);
+    border: 1px solid var(--gris-borde);
+    color: var(--blanco-marfil);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(6px);
+    z-index: 2;
+  }
+
+  .lightbox-flecha:hover {
+    background: var(--dorado);
+    color: var(--negro);
+    border-color: var(--dorado);
+    transform: translateY(-50%) scale(1.08);
+  }
+
+  .lightbox-flecha.prev { left: 1rem; }
+  .lightbox-flecha.next { right: 1rem; }
+
+  /* Ocultar flechas si solo hay una imagen */
+  .lightbox-overlay.single-image .lightbox-flecha { display: none; }
+
+  /* Indicador de puntos (● ○ ○ ○) debajo del precio */
+  .lightbox-dots {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .lightbox-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(250, 246, 238, 0.25);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+    padding: 0;
+  }
+
+  .lightbox-dot.activo {
+    background: var(--dorado);
+    transform: scale(1.25);
+  }
+
+  .lightbox-dot:hover {
+    background: var(--dorado-claro);
+  }
+
+  .lightbox-overlay.single-image .lightbox-dots { display: none; }
+
+  /* Puntitos en la tarjeta del catálogo (indica "hay más fotos") */
+  .producto-imagen-dots {
+    position: absolute;
+    bottom: 0.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.3rem 0.55rem;
+    background: rgba(10, 10, 10, 0.65);
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    z-index: 2;
+  }
+
+  .producto-imagen-dots .card-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--dorado);
+    opacity: 0.85;
+  }
+
+  @media (max-width: 768px) {
+    .lightbox-flecha {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+    .lightbox-flecha.prev { left: 0.5rem; }
+    .lightbox-flecha.next { right: 0.5rem; }
+  }
+
+  /* ============================================
      Botón flotante de WhatsApp directo (esquina inf. derecha)
      ============================================ */
   .btn-whatsapp-flotante {
@@ -1531,6 +1927,25 @@
 
 <div class="filters" id="filters">
   <!-- Se generan dinámicamente -->
+</div>
+
+<!-- Filtro por rango de precio (se muestra/oculta dinámicamente) -->
+<div class="precio-filtro" id="precioFiltro" style="display: none;">
+  <div class="precio-filtro-header">
+    <span class="precio-filtro-label">💰 Precio (USD)</span>
+    <span class="precio-filtro-valores">
+      <span id="precioMinLabel">$0</span>
+      <span class="separador">—</span>
+      <span id="precioMaxLabel">$0</span>
+    </span>
+    <button class="precio-filtro-limpiar oculto" id="precioLimpiar" type="button">Limpiar</button>
+  </div>
+  <div class="precio-slider-wrap">
+    <div class="precio-slider-track"></div>
+    <div class="precio-slider-rango" id="precioSliderRango"></div>
+    <input type="range" id="precioMinInput" min="0" max="100" value="0" aria-label="Precio mínimo">
+    <input type="range" id="precioMaxInput" min="0" max="100" value="100" aria-label="Precio máximo">
+  </div>
 </div>
 
 <section class="productos" id="productos">
@@ -1768,11 +2183,14 @@
 <!-- Lightbox de imágenes de producto -->
 <div class="lightbox-overlay" id="lightboxOverlay" role="dialog" aria-label="Imagen ampliada">
   <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar imagen">×</button>
+  <button class="lightbox-flecha prev" id="lightboxPrev" aria-label="Imagen anterior">❮</button>
+  <button class="lightbox-flecha next" id="lightboxNext" aria-label="Imagen siguiente">❯</button>
   <div class="lightbox-contenido">
     <img class="lightbox-imagen" id="lightboxImg" src="" alt="">
     <div class="lightbox-info">
       <div class="lightbox-nombre" id="lightboxNombre"></div>
       <div class="lightbox-precio" id="lightboxPrecio"></div>
+      <div class="lightbox-dots" id="lightboxDots"></div>
     </div>
   </div>
 </div>
@@ -1873,6 +2291,8 @@ let state = {
   carrito: {},
   categoriaActiva: 'Todo',
   busqueda: '',
+  precioMin: null, // null = sin filtro activo
+  precioMax: null,
   editandoId: null,
   fuenteDatos: 'local', // 'local' o 'sheet'
   cargandoSheet: false
@@ -1981,6 +2401,10 @@ function filasAProductos(rows) {
   const idxCat = headers.indexOf('categoria');
   const idxPrecio = headers.indexOf('precio');
   const idxImg = headers.indexOf('imagen');
+  const idxImg2 = headers.indexOf('imagen2');
+  const idxImg3 = headers.indexOf('imagen3');
+  const idxImg4 = headers.indexOf('imagen4');
+  const idxEstado = headers.indexOf('estado');
 
   if (idxNombre === -1 || idxPrecio === -1) {
     throw new Error('El Sheet debe tener al menos las columnas: nombre y precio');
@@ -1996,13 +2420,34 @@ function filasAProductos(rows) {
     const precio = parseFloat(precioStr);
     if (isNaN(precio)) continue;
 
+    // Parsear la columna 'estado' → convertimos a flags booleanos.
+    // Es case-insensitive y acepta varios estados combinados separados por guiones,
+    // comas, espacios o barras (ej: "destacado-agotado", "destacado agotado").
+    const estadoRaw = idxEstado >= 0 ? norm(fila[idxEstado] || '') : '';
+    const agotado = estadoRaw.includes('agotado');
+    const proximamente = estadoRaw.includes('proximamente');
+    const destacado = estadoRaw.includes('destacado');
+
+    // Recolectar hasta 4 imágenes en orden, ignorando celdas vacías.
+    const imgPrincipal = idxImg >= 0 ? (fila[idxImg] || '').trim() : '';
+    const imagenes = [
+      imgPrincipal,
+      idxImg2 >= 0 ? (fila[idxImg2] || '').trim() : '',
+      idxImg3 >= 0 ? (fila[idxImg3] || '').trim() : '',
+      idxImg4 >= 0 ? (fila[idxImg4] || '').trim() : ''
+    ].filter(url => url.length > 0);
+
     productos.push({
       id: r, // usamos el número de fila como id
       nombre: nombre,
       descripcion: idxDesc >= 0 ? (fila[idxDesc] || '').trim() : '',
       categoria: idxCat >= 0 ? ((fila[idxCat] || 'Sin categoría').trim() || 'Sin categoría') : 'Sin categoría',
       precio: precio,
-      imagen: idxImg >= 0 ? (fila[idxImg] || '').trim() : ''
+      imagen: imgPrincipal,         // se mantiene para retrocompatibilidad (catálogo)
+      imagenes: imagenes,           // array completo para el lightbox
+      agotado: agotado,
+      proximamente: proximamente,
+      destacado: destacado
     });
   }
   return productos;
@@ -2070,6 +2515,22 @@ async function cargarProductosDesdeSheet(silencioso = false) {
     state.productos = productos;
     state.fuenteDatos = 'sheet';
 
+    // Si algún producto que estaba en el carrito pasó a agotado/proximamente,
+    // lo quitamos del carrito para no checkout pedidos que no podremos cumplir.
+    let removidos = 0;
+    for (const idStr of Object.keys(state.carrito)) {
+      const id = parseInt(idStr);
+      const prod = productos.find(p => p.id === id);
+      if (prod && (prod.agotado || prod.proximamente)) {
+        delete state.carrito[idStr];
+        removidos++;
+      }
+    }
+    if (removidos > 0) {
+      guardarDatos();
+      actualizarCarrito();
+    }
+
     // Guardar cache local del último sheet exitoso
     try {
       localStorage.setItem(STORAGE_KEY + '_cache', JSON.stringify({
@@ -2133,6 +2594,137 @@ function renderFiltros() {
   });
 }
 
+// ===== FILTRO DE PRECIO =====
+// Inicializa el slider con los límites del catálogo actual.
+// Se llama después de cargar productos (desde sheet, cache o local).
+function inicializarFiltroPrecio() {
+  const wrapper = document.getElementById('precioFiltro');
+  const minInput = document.getElementById('precioMinInput');
+  const maxInput = document.getElementById('precioMaxInput');
+
+  if (state.productos.length < 2) {
+    // Con 1 producto o menos, el filtro no tiene sentido → ocultar
+    wrapper.style.display = 'none';
+    return;
+  }
+
+  const precios = state.productos.map(p => p.precio);
+  const minReal = Math.floor(Math.min(...precios));
+  const maxReal = Math.ceil(Math.max(...precios));
+
+  // Si todos los productos cuestan lo mismo, no hay nada que filtrar
+  if (minReal === maxReal) {
+    wrapper.style.display = 'none';
+    return;
+  }
+
+  // Configurar los inputs con los límites reales
+  minInput.min = minReal;
+  minInput.max = maxReal;
+  maxInput.min = minReal;
+  maxInput.max = maxReal;
+
+  // Si los valores actuales están fuera del nuevo rango, ajustar
+  minInput.value = minReal;
+  maxInput.value = maxReal;
+
+  // Filtro empieza vacío (muestra todo)
+  state.precioMin = null;
+  state.precioMax = null;
+
+  wrapper.style.display = 'block';
+  actualizarUIPrecio();
+}
+
+// Redibuja el rango dorado y los labels según valores actuales del slider
+function actualizarUIPrecio() {
+  const minInput = document.getElementById('precioMinInput');
+  const maxInput = document.getElementById('precioMaxInput');
+  const minLabel = document.getElementById('precioMinLabel');
+  const maxLabel = document.getElementById('precioMaxLabel');
+  const rango = document.getElementById('precioSliderRango');
+  const btnLimpiar = document.getElementById('precioLimpiar');
+
+  const min = parseFloat(minInput.value);
+  const max = parseFloat(maxInput.value);
+  const absMin = parseFloat(minInput.min);
+  const absMax = parseFloat(minInput.max);
+  const span = absMax - absMin;
+
+  // Posición de la pista activa en %
+  const leftPct = span > 0 ? ((min - absMin) / span) * 100 : 0;
+  const rightPct = span > 0 ? ((max - absMin) / span) * 100 : 100;
+  rango.style.left = leftPct + '%';
+  rango.style.width = (rightPct - leftPct) + '%';
+
+  // Labels con formato $
+  minLabel.textContent = '$' + min;
+  maxLabel.textContent = '$' + max;
+
+  // Mostrar botón "Limpiar" solo si el filtro está activo
+  const filtroActivo = (min > absMin) || (max < absMax);
+  btnLimpiar.classList.toggle('oculto', !filtroActivo);
+}
+
+function aplicarFiltroPrecio() {
+  const minInput = document.getElementById('precioMinInput');
+  const maxInput = document.getElementById('precioMaxInput');
+  const absMin = parseFloat(minInput.min);
+  const absMax = parseFloat(minInput.max);
+  const min = parseFloat(minInput.value);
+  const max = parseFloat(maxInput.value);
+
+  // Si los valores están en los extremos, significa "sin filtro"
+  state.precioMin = (min > absMin) ? min : null;
+  state.precioMax = (max < absMax) ? max : null;
+
+  renderProductos();
+}
+
+function limpiarFiltroPrecio() {
+  const minInput = document.getElementById('precioMinInput');
+  const maxInput = document.getElementById('precioMaxInput');
+  minInput.value = minInput.min;
+  maxInput.value = maxInput.max;
+  state.precioMin = null;
+  state.precioMax = null;
+  actualizarUIPrecio();
+  renderProductos();
+}
+
+// Listeners del slider. Los dos handles no deben cruzarse entre sí.
+(function setupSliderPrecio() {
+  const minInput = document.getElementById('precioMinInput');
+  const maxInput = document.getElementById('precioMaxInput');
+  const btnLimpiar = document.getElementById('precioLimpiar');
+
+  // 'input' → actualizar UI mientras arrastras (sin re-renderizar productos)
+  minInput.addEventListener('input', () => {
+    const min = parseFloat(minInput.value);
+    const max = parseFloat(maxInput.value);
+    if (min > max - 1) {
+      // Evitar cruce: el min no puede pasar al max
+      minInput.value = Math.max(parseFloat(minInput.min), max - 1);
+    }
+    actualizarUIPrecio();
+  });
+
+  maxInput.addEventListener('input', () => {
+    const min = parseFloat(minInput.value);
+    const max = parseFloat(maxInput.value);
+    if (max < min + 1) {
+      maxInput.value = Math.min(parseFloat(maxInput.max), min + 1);
+    }
+    actualizarUIPrecio();
+  });
+
+  // 'change' → re-renderizar productos al soltar (mejor performance)
+  minInput.addEventListener('change', aplicarFiltroPrecio);
+  maxInput.addEventListener('change', aplicarFiltroPrecio);
+
+  btnLimpiar.addEventListener('click', limpiarFiltroPrecio);
+})();
+
 // ===== RENDER PRODUCTOS =====
 function renderProductos() {
   const cont = document.getElementById('productos');
@@ -2155,6 +2747,22 @@ function renderProductos() {
       p.categoria.toLowerCase().includes(q)
     );
   }
+  // Filtro por rango de precio (si hay uno activo)
+  if (state.precioMin !== null) {
+    lista = lista.filter(p => p.precio >= state.precioMin);
+  }
+  if (state.precioMax !== null) {
+    lista = lista.filter(p => p.precio <= state.precioMax);
+  }
+
+  // Ordenar: disponibles primero, luego próximamente, luego agotados.
+  // Usamos un sort estable (JS moderno lo garantiza) para mantener el orden
+  // original del Sheet dentro de cada grupo.
+  lista = [...lista].sort((a, b) => {
+    const prioA = a.agotado ? 2 : (a.proximamente ? 1 : 0);
+    const prioB = b.agotado ? 2 : (b.proximamente ? 1 : 0);
+    return prioA - prioB;
+  });
 
   if (lista.length === 0) {
     cont.innerHTML = '<div class="empty-state">No encontramos productos que coincidan ✨</div>';
@@ -2168,22 +2776,73 @@ function renderProductos() {
       ? `<img src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" onerror="this.outerHTML='<div class=\\'producto-imagen-placeholder\\'>${inicial}</div>'">`
       : `<div class="producto-imagen-placeholder">${inicial}</div>`;
 
-    const controlHtml = cantidad > 0
-      ? `<div class="cantidad-control">
-           <button class="cantidad-btn" data-minus="${p.id}" aria-label="Disminuir cantidad">−</button>
-           <div class="cantidad-display">
-             <span>${cantidad}</span>
-             <span class="cantidad-display-label">en carrito</span>
-           </div>
-           <button class="cantidad-btn" data-plus="${p.id}" aria-label="Aumentar cantidad">+</button>
-         </div>`
-      : `<button class="btn-agregar" data-add="${p.id}">Agregar al carrito</button>`;
+    // Controles de compra: ocultos si está agotado o próximamente
+    let controlHtml = '';
+    if (!p.agotado && !p.proximamente) {
+      controlHtml = cantidad > 0
+        ? `<div class="cantidad-control">
+             <button class="cantidad-btn" data-minus="${p.id}" aria-label="Disminuir cantidad">−</button>
+             <div class="cantidad-display">
+               <span>${cantidad}</span>
+               <span class="cantidad-display-label">en carrito</span>
+             </div>
+             <button class="cantidad-btn" data-plus="${p.id}" aria-label="Aumentar cantidad">+</button>
+           </div>`
+        : `<button class="btn-agregar" data-add="${p.id}">Agregar al carrito</button>`;
+    }
+
+    // Cintas de estado
+    let cintaDestacado = '';
+    if (p.destacado) {
+      cintaDestacado = `<span class="cinta-destacado">✨ Destacado</span>`;
+    }
+    let cintaEstado = '';
+    if (p.agotado) {
+      cintaEstado = `<span class="estado-cinta cinta-agotado">Agotado</span>`;
+    } else if (p.proximamente) {
+      cintaEstado = `<span class="estado-cinta cinta-proximamente">Próximamente</span>`;
+    }
+
+    // Clases de la tarjeta según estado
+    const clases = ['producto-card'];
+    if (p.agotado) clases.push('agotado');
+    if (p.proximamente) clases.push('proximamente');
+    if (p.destacado) clases.push('destacado');
+
+    // Puntitos que indican "hay más fotos" (solo si hay más de 1 imagen).
+    // Retrocompatible: si p.imagenes no existe (cache viejo), usa p.imagen.
+    const imgs = obtenerImagenes(p);
+    let dotsCard = '';
+    if (imgs.length > 1) {
+      const puntitos = imgs.map(() => '<span class="card-dot"></span>').join('');
+      dotsCard = `<div class="producto-imagen-dots">${puntitos}</div>`;
+    }
+
+    // Botón compartir: oculto en productos "próximamente" porque aún no existen.
+    // Los agotados sí se pueden compartir (la clienta puede guardarlo).
+    let btnCompartirHtml = '';
+    if (!p.proximamente) {
+      btnCompartirHtml = `
+        <button class="btn-compartir" data-compartir="${p.id}" aria-label="Compartir ${escapeHtml(p.nombre)}" title="Compartir producto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>`;
+    }
 
     return `
-      <article class="producto-card" data-producto-id="${p.id}">
+      <article class="${clases.join(' ')}" data-producto-id="${p.id}">
         <div class="producto-imagen">
+          ${cintaDestacado}
           <span class="categoria-tag">${escapeHtml(p.categoria)}</span>
+          ${cintaEstado}
+          ${btnCompartirHtml}
           ${imgHtml}
+          ${dotsCard}
         </div>
         <div class="producto-info">
           <h3 class="producto-nombre">${escapeHtml(p.nombre)}</h3>
@@ -2206,6 +2865,15 @@ function renderProductos() {
   });
   cont.querySelectorAll('[data-minus]').forEach(btn => {
     btn.onclick = () => cambiarCantidad(parseInt(btn.dataset.minus), -1);
+  });
+  // Botón compartir: stopPropagation para no abrir también el lightbox
+  cont.querySelectorAll('[data-compartir]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.compartir);
+      const prod = state.productos.find(p => p.id === id);
+      if (prod) compartirProducto(prod);
+    };
   });
   // Click en la imagen → abrir lightbox (solo si el producto tiene imagen)
   cont.querySelectorAll('.producto-imagen').forEach(div => {
@@ -2562,6 +3230,7 @@ function importar(file) {
       cargarConfigEnForm();
       renderAdminProductos();
       renderFiltros();
+      inicializarFiltroPrecio();
       renderProductos();
       actualizarCarrito();
       mostrarToast('Datos importados ✨');
@@ -2606,6 +3275,7 @@ document.getElementById('btnRecargarSheet').onclick = async () => {
   const ok = await cargarProductosDesdeSheet();
   if (ok) {
     renderFiltros();
+    inicializarFiltroPrecio();
     renderProductos();
     actualizarCarrito();
     renderAdminProductos();
@@ -2643,35 +3313,193 @@ document.getElementById('comoComprarOverlay').onclick = (e) => {
   }
 };
 
-// ===== LIGHTBOX DE IMÁGENES =====
+// ===== COMPARTIR PRODUCTO =====
+// Mensaje pre-llenado que aparece al compartir por WhatsApp/redes
+const MENSAJE_COMPARTIR = 'Este producto de Bellas me encantó:';
+
+async function compartirProducto(producto) {
+  // Armar el link con el parámetro ?p=ID
+  const base = window.location.origin + window.location.pathname;
+  const url = `${base}?p=${producto.id}`;
+
+  // Texto completo para compartir
+  const texto = `${MENSAJE_COMPARTIR}\n\n${producto.nombre} - ${fmtUSD(producto.precio)}`;
+
+  // 1) Intentar Web Share API (móvil nativo: WhatsApp, Instagram, etc.)
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: producto.nombre,
+        text: texto,
+        url: url
+      });
+      return;
+    } catch (err) {
+      // El usuario canceló el diálogo → no hacer nada
+      if (err.name === 'AbortError') return;
+      // Otros errores: caer al fallback de copiar link
+      console.warn('Share API falló, copiando al portapapeles:', err);
+    }
+  }
+
+  // 2) Fallback para desktop: copiar al portapapeles
+  const textoCompleto = `${texto}\n${url}`;
+  try {
+    await navigator.clipboard.writeText(textoCompleto);
+    mostrarToast('🔗 Link copiado al portapapeles');
+  } catch (err) {
+    // 3) Ultra-fallback para navegadores muy viejos
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = textoCompleto;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      mostrarToast('🔗 Link copiado');
+    } catch (e2) {
+      mostrarToast('⚠️ No se pudo copiar. URL: ' + url);
+    }
+  }
+}
+
+// Abre el lightbox de un producto específico si la URL trae ?p=ID
+function abrirProductoDesdeURL() {
+  const params = new URLSearchParams(window.location.search);
+  const pid = params.get('p');
+  if (!pid) return;
+
+  const id = parseInt(pid);
+  if (isNaN(id)) return;
+
+  const prod = state.productos.find(p => p.id === id);
+  if (prod) {
+    abrirLightbox(prod);
+    // Limpiar el parámetro de la URL sin recargar (para que si cierran y comparten
+    // de nuevo, no quede "fijado" en la URL del navegador)
+    const url = new URL(window.location.href);
+    url.searchParams.delete('p');
+    window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+  }
+}
+
+// ===== LIGHTBOX DE IMÁGENES (con carrusel multi-imagen) =====
+
+// Estado del lightbox: qué imágenes y en cuál estamos
+const lightboxState = {
+  imagenes: [],
+  indice: 0
+};
+
+// Helper retrocompatible: obtiene el array de imágenes de un producto.
+// Si el producto viene del cache viejo (sin p.imagenes), cae a p.imagen.
+function obtenerImagenes(producto) {
+  if (Array.isArray(producto.imagenes) && producto.imagenes.length > 0) {
+    return producto.imagenes;
+  }
+  return producto.imagen ? [producto.imagen] : [];
+}
+
 function abrirLightbox(producto) {
   const overlay = document.getElementById('lightboxOverlay');
-  const img = document.getElementById('lightboxImg');
   const nombre = document.getElementById('lightboxNombre');
   const precio = document.getElementById('lightboxPrecio');
 
-  img.src = producto.imagen;
-  img.alt = producto.nombre;
+  const imgs = obtenerImagenes(producto);
+  if (imgs.length === 0) return;
+
+  lightboxState.imagenes = imgs;
+  lightboxState.indice = 0;
+
   nombre.textContent = producto.nombre;
   precio.innerHTML = `${fmtUSD(producto.precio)}<span class="lightbox-separador">·</span>${fmtCOP(producto.precio)}<span class="lightbox-separador">·</span>${fmtVES(producto.precio)}`;
 
+  // Marca "single-image" oculta flechas y dots cuando solo hay 1 imagen
+  overlay.classList.toggle('single-image', imgs.length === 1);
+
+  renderLightboxDots();
+  mostrarImagenLightbox(0);
+
   overlay.classList.add('open');
-  document.body.style.overflow = 'hidden'; // bloquear scroll del fondo
+  document.body.style.overflow = 'hidden';
 }
+
+function renderLightboxDots() {
+  const cont = document.getElementById('lightboxDots');
+  cont.innerHTML = lightboxState.imagenes.map((_, i) =>
+    `<button class="lightbox-dot ${i === lightboxState.indice ? 'activo' : ''}" data-idx="${i}" aria-label="Imagen ${i + 1}"></button>`
+  ).join('');
+  cont.querySelectorAll('.lightbox-dot').forEach(dot => {
+    dot.onclick = () => mostrarImagenLightbox(parseInt(dot.dataset.idx));
+  });
+}
+
+function mostrarImagenLightbox(indice) {
+  const img = document.getElementById('lightboxImg');
+  const total = lightboxState.imagenes.length;
+  if (total === 0) return;
+
+  // Wrap-around: si pasas del último, vuelves al primero y viceversa
+  if (indice < 0) indice = total - 1;
+  if (indice >= total) indice = 0;
+
+  lightboxState.indice = indice;
+  img.src = lightboxState.imagenes[indice];
+  img.alt = document.getElementById('lightboxNombre').textContent;
+
+  // Actualizar punto activo
+  document.querySelectorAll('.lightbox-dot').forEach((dot, i) => {
+    dot.classList.toggle('activo', i === indice);
+  });
+}
+
+function lightboxSiguiente() { mostrarImagenLightbox(lightboxState.indice + 1); }
+function lightboxAnterior()  { mostrarImagenLightbox(lightboxState.indice - 1); }
 
 function cerrarLightbox() {
   const overlay = document.getElementById('lightboxOverlay');
   overlay.classList.remove('open');
-  document.body.style.overflow = ''; // restaurar scroll
+  document.body.style.overflow = '';
 }
 
+// === Listeners del lightbox ===
 document.getElementById('lightboxClose').onclick = cerrarLightbox;
+document.getElementById('lightboxPrev').onclick = (e) => { e.stopPropagation(); lightboxAnterior(); };
+document.getElementById('lightboxNext').onclick = (e) => { e.stopPropagation(); lightboxSiguiente(); };
 document.getElementById('lightboxOverlay').onclick = (e) => {
-  // Cerrar si se hace clic en el fondo (overlay), no en el contenido
+  // Cerrar solo si se hace clic en el fondo, no en el contenido ni en flechas
   if (e.target === document.getElementById('lightboxOverlay')) {
     cerrarLightbox();
   }
 };
+
+// Navegación con teclado (← →) cuando el lightbox está abierto
+document.addEventListener('keydown', (e) => {
+  const overlay = document.getElementById('lightboxOverlay');
+  if (!overlay.classList.contains('open')) return;
+  if (e.key === 'ArrowRight') lightboxSiguiente();
+  else if (e.key === 'ArrowLeft') lightboxAnterior();
+});
+
+// Swipe en móvil: detectar gesto horizontal sobre el contenido
+(function setupLightboxSwipe() {
+  const contenido = document.querySelector('.lightbox-contenido');
+  if (!contenido) return;
+  let touchStartX = 0;
+  let touchEndX = 0;
+  contenido.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  contenido.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const delta = touchEndX - touchStartX;
+    if (Math.abs(delta) < 50) return; // umbral mínimo para evitar falsos positivos
+    if (delta < 0) lightboxSiguiente(); // swipe izquierda → siguiente
+    else lightboxAnterior();             // swipe derecha → anterior
+  }, { passive: true });
+})();
 
 // ===== Botón flotante de WhatsApp directo =====
 // Mensaje pre-llenado para consultas rápidas (independiente del mensaje del carrito)
@@ -2698,6 +3526,11 @@ function cerrarComoComprar() {
 }
 
 function mostrarComoComprarSiPrimeraVez() {
+  // Si el usuario llega con ?p=ID (link compartido), no mostrar el modal
+  // porque vamos a abrir el lightbox de ese producto.
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('p')) return;
+
   try {
     const visto = localStorage.getItem(COMO_COMPRAR_KEY);
     if (!visto) {
@@ -2732,6 +3565,7 @@ async function init() {
   if (state.config.sheetUrl) {
     const hayCache = cargarCacheSheet();
     renderFiltros();
+    inicializarFiltroPrecio();
     renderProductos();
     actualizarCarrito();
 
@@ -2739,6 +3573,7 @@ async function init() {
     const ok = await cargarProductosDesdeSheet(true);
     if (ok) {
       renderFiltros();
+      inicializarFiltroPrecio();
       renderProductos();
       actualizarCarrito();
     } else if (!hayCache) {
@@ -2747,6 +3582,7 @@ async function init() {
     }
   } else {
     renderFiltros();
+    inicializarFiltroPrecio();
     renderProductos();
     actualizarCarrito();
   }
@@ -2761,6 +3597,9 @@ async function init() {
 
   // Inicializar el link del botón flotante de WhatsApp
   actualizarBtnWhatsapp();
+
+  // Si la URL trae ?p=ID → abrir lightbox de ese producto (link compartido)
+  abrirProductoDesdeURL();
 }
 
 // Escuchar cambios de hash para activar admin sin recargar
