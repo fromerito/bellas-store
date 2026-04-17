@@ -2201,6 +2201,82 @@
 // ===== ESTADO =====
 const STORAGE_KEY = 'bellas_data_v1';
 
+// ===== CARRITO PERSISTENTE =====
+// Guardamos el carrito en localStorage por 3 días para que la clienta
+// no pierda sus productos si cierra el navegador y vuelve más tarde.
+const CARRITO_KEY = 'bellas_carrito_v1';
+const CARRITO_VIDA_MS = 3 * 24 * 60 * 60 * 1000; // 3 días en milisegundos
+
+function guardarCarrito() {
+  try {
+    // Si el carrito está vacío, borramos la clave para no dejar basura
+    if (Object.keys(state.carrito).length === 0) {
+      localStorage.removeItem(CARRITO_KEY);
+      return;
+    }
+    localStorage.setItem(CARRITO_KEY, JSON.stringify({
+      items: state.carrito,
+      timestamp: Date.now()
+    }));
+  } catch (e) {
+    // localStorage puede fallar (incógnito, cuota llena, etc.). Lo ignoramos
+    // silenciosamente — el carrito sigue funcionando en memoria.
+  }
+}
+
+// Carga el carrito si no ha expirado. Retorna true si se recuperó algo.
+function cargarCarritoGuardado() {
+  try {
+    const raw = localStorage.getItem(CARRITO_KEY);
+    if (!raw) return false;
+
+    const data = JSON.parse(raw);
+    if (!data || !data.items || !data.timestamp) {
+      localStorage.removeItem(CARRITO_KEY);
+      return false;
+    }
+
+    // ¿Expiró?
+    const edad = Date.now() - data.timestamp;
+    if (edad > CARRITO_VIDA_MS) {
+      localStorage.removeItem(CARRITO_KEY);
+      return false;
+    }
+
+    // Filtrar productos que ya no existen o cambiaron a agotado/proximamente
+    // (sólo puede filtrarse aquí si productos ya está cargado)
+    const carritoFiltrado = {};
+    let perdidos = 0;
+    for (const [idStr, qty] of Object.entries(data.items)) {
+      const id = parseInt(idStr);
+      const prod = state.productos.find(p => p.id === id);
+      if (prod && !prod.agotado && !prod.proximamente && qty > 0) {
+        carritoFiltrado[id] = qty;
+      } else {
+        perdidos++;
+      }
+    }
+
+    state.carrito = carritoFiltrado;
+
+    // Si recuperamos algo, avisar discretamente
+    const recuperados = Object.keys(carritoFiltrado).length;
+    if (recuperados > 0) {
+      // Pequeño retraso para que el toast aparezca después del render inicial
+      setTimeout(() => mostrarToast('👜 Tu carrito anterior está aquí'), 600);
+    }
+
+    // Si algunos productos se perdieron (agotados/eliminados), persistir el
+    // nuevo estado limpio para no mostrar el mensaje de nuevo
+    if (perdidos > 0 || recuperados > 0) {
+      guardarCarrito();
+    }
+    return recuperados > 0;
+  } catch (e) {
+    return false;
+  }
+}
+
 const defaultData = {
   config: {
     sheetUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFxe-eBox6aa3W7n-ZbY4NDGq5y9RYuM1YpPnRfbkzcIL_lDpvEj9zico2LnYAqfUcbgj-_1m8TfKf/pub?gid=0&single=true&output=csv',
@@ -2528,6 +2604,7 @@ async function cargarProductosDesdeSheet(silencioso = false) {
     }
     if (removidos > 0) {
       guardarDatos();
+      guardarCarrito();
       actualizarCarrito();
     }
 
@@ -2926,6 +3003,7 @@ function agregarAlCarrito(id) {
   state.carrito[id] = (state.carrito[id] || 0) + 1;
   actualizarControlProducto(id);
   actualizarCarrito();
+  guardarCarrito();
   const p = state.productos.find(x => x.id === id);
   mostrarToast(`✨ ${p.nombre} agregado al carrito`);
 }
@@ -2939,12 +3017,14 @@ function cambiarCantidad(id, delta) {
   }
   actualizarControlProducto(id);
   actualizarCarrito();
+  guardarCarrito();
 }
 
 function eliminarDelCarrito(id) {
   delete state.carrito[id];
   actualizarControlProducto(id);
   actualizarCarrito();
+  guardarCarrito();
 }
 
 function totalCantidadCarrito() {
@@ -3567,6 +3647,10 @@ async function init() {
     renderFiltros();
     inicializarFiltroPrecio();
     renderProductos();
+    // Cargar carrito persistente (lo hacemos aquí para que esté listo antes
+    // del primer render del carrito). Si luego el Sheet trae cambios,
+    // el carrito se ajustará automáticamente.
+    cargarCarritoGuardado();
     actualizarCarrito();
 
     // Cargar en background desde el Sheet (sin bloquear render)
@@ -3584,6 +3668,7 @@ async function init() {
     renderFiltros();
     inicializarFiltroPrecio();
     renderProductos();
+    cargarCarritoGuardado();
     actualizarCarrito();
   }
 
