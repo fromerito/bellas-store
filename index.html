@@ -939,6 +939,224 @@
     transform: translateX(-50%) translateY(0);
   }
 
+  /* Modal Cómo Comprar */
+  .como-comprar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 350;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .como-comprar-overlay.open {
+    display: flex;
+    opacity: 1;
+  }
+
+  .como-comprar-modal {
+    background: linear-gradient(180deg, var(--negro-suave) 0%, var(--negro) 100%);
+    border: 1px solid var(--dorado);
+    border-radius: 4px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px -15px rgba(201, 162, 77, 0.4);
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.4s cubic-bezier(0.34, 1.3, 0.64, 1);
+  }
+
+  .como-comprar-overlay.open .como-comprar-modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .como-comprar-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--dorado), transparent);
+  }
+
+  .como-comprar-header {
+    padding: 2rem 1.75rem 1rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .como-comprar-close {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    background: transparent;
+    border: none;
+    color: rgba(250, 246, 238, 0.5);
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    line-height: 1;
+    transition: color 0.3s ease;
+  }
+  .como-comprar-close:hover { color: var(--dorado); }
+
+  .como-comprar-titulo {
+    font-family: var(--font-display);
+    color: var(--dorado-claro);
+    font-size: 2.5rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .como-comprar-subtitulo {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: rgba(250, 246, 238, 0.7);
+    font-size: 1rem;
+  }
+
+  .pasos {
+    padding: 0.5rem 1.75rem 1.5rem;
+  }
+
+  .paso {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  .paso:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 23px;
+    top: 48px;
+    bottom: -10px;
+    width: 1px;
+    background: linear-gradient(180deg, var(--dorado) 0%, transparent 100%);
+    opacity: 0.4;
+  }
+
+  .paso-numero {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--dorado) 0%, var(--dorado-claro) 100%);
+    color: var(--negro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px -4px rgba(201, 162, 77, 0.5);
+  }
+
+  .paso-contenido {
+    flex: 1;
+    padding-top: 0.25rem;
+  }
+
+  .paso-titulo {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    color: var(--blanco-marfil);
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .paso-descripcion {
+    font-size: 0.88rem;
+    color: rgba(250, 246, 238, 0.65);
+    line-height: 1.5;
+  }
+
+  .como-comprar-footer {
+    padding: 0 1.75rem 1.75rem;
+    text-align: center;
+  }
+
+  .btn-empezar {
+    background: linear-gradient(135deg, var(--dorado) 0%, var(--dorado-claro) 100%);
+    color: var(--negro);
+    border: none;
+    padding: 0.85rem 2.5rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .btn-empezar:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--sombra-dorada);
+  }
+
+  /* Botón flotante ¿Cómo comprar? */
+  .btn-ayuda-flotante {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 99;
+    background: var(--negro);
+    border: 1px solid var(--dorado);
+    color: var(--dorado-claro);
+    padding: 0.7rem 1.1rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: 0.03em;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    background: rgba(10, 10, 10, 0.9);
+  }
+
+  .btn-ayuda-flotante:hover {
+    background: var(--dorado);
+    color: var(--negro);
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-dorada);
+  }
+
+  @media (max-width: 768px) {
+    .como-comprar-titulo { font-size: 2rem; }
+    .como-comprar-header { padding: 1.5rem 1.25rem 0.75rem; }
+    .pasos { padding: 0.25rem 1.25rem 1rem; }
+    .como-comprar-footer { padding: 0 1.25rem 1.5rem; }
+    .paso-numero { width: 40px; height: 40px; font-size: 1.1rem; }
+    .paso:not(:last-child)::after { left: 20px; }
+    .btn-ayuda-flotante {
+      bottom: 1rem;
+      left: 1rem;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.75rem;
+    }
+  }
+
   /* Animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -1171,6 +1389,63 @@
     <div class="footer-copy">© 2026 Bellas · Tienda online</div>
   </div>
 </footer>
+
+<!-- Modal Cómo Comprar -->
+<div class="como-comprar-overlay" id="comoComprarOverlay">
+  <div class="como-comprar-modal">
+    <div class="como-comprar-header">
+      <button class="como-comprar-close" id="comoComprarClose" aria-label="Cerrar">✕</button>
+      <div class="como-comprar-titulo">¿Cómo comprar?</div>
+      <div class="como-comprar-subtitulo">Comprar en Bellas es muy fácil ✨</div>
+    </div>
+    <div class="pasos">
+      <div class="paso">
+        <div class="paso-numero">1</div>
+        <div class="paso-contenido">
+          <div class="paso-titulo">🔍 Explora el catálogo</div>
+          <div class="paso-descripcion">Navega por nuestras categorías o usa el buscador para encontrar el producto que te encanta.</div>
+        </div>
+      </div>
+      <div class="paso">
+        <div class="paso-numero">2</div>
+        <div class="paso-contenido">
+          <div class="paso-titulo">🛒 Agrega al carrito</div>
+          <div class="paso-descripcion">Toca "Agregar al carrito" en los productos que quieras llevar. Puedes ajustar las cantidades desde el carrito.</div>
+        </div>
+      </div>
+      <div class="paso">
+        <div class="paso-numero">3</div>
+        <div class="paso-contenido">
+          <div class="paso-titulo">💰 Revisa tu pedido</div>
+          <div class="paso-descripcion">Abre el carrito y verifica los productos y el total en dólares, pesos colombianos o bolívares.</div>
+        </div>
+      </div>
+      <div class="paso">
+        <div class="paso-numero">4</div>
+        <div class="paso-contenido">
+          <div class="paso-titulo">💬 Pide por WhatsApp</div>
+          <div class="paso-descripcion">Presiona "Pedir por WhatsApp" y se abrirá un chat con tu pedido listo para enviar.</div>
+        </div>
+      </div>
+      <div class="paso">
+        <div class="paso-numero">5</div>
+        <div class="paso-contenido">
+          <div class="paso-titulo">🌸 Coordinamos todo</div>
+          <div class="paso-descripcion">Te confirmamos disponibilidad, forma de pago y entrega directamente por WhatsApp. ¡Así de simple!</div>
+        </div>
+      </div>
+    </div>
+    <div class="como-comprar-footer">
+      <button class="btn-empezar" id="btnEmpezarCompra">¡Comenzar a comprar!</button>
+    </div>
+  </div>
+</div>
+
+<!-- Botón flotante de ayuda -->
+<button class="btn-ayuda-flotante" id="btnAyudaFlotante" title="¿Cómo comprar?">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  ¿Cómo comprar?
+</button>
 
 <div class="toast" id="toast"></div>
 
@@ -1956,8 +2231,42 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     cerrarCarrito();
     cerrarAdmin();
+    cerrarComoComprar();
   }
 });
+
+// Modal Cómo Comprar
+document.getElementById('btnAyudaFlotante').onclick = abrirComoComprar;
+document.getElementById('comoComprarClose').onclick = cerrarComoComprar;
+document.getElementById('btnEmpezarCompra').onclick = cerrarComoComprar;
+document.getElementById('comoComprarOverlay').onclick = (e) => {
+  // Cerrar solo si se hace clic en el overlay, no en el modal en sí
+  if (e.target === document.getElementById('comoComprarOverlay')) {
+    cerrarComoComprar();
+  }
+};
+
+// ===== MODAL CÓMO COMPRAR =====
+const COMO_COMPRAR_KEY = 'bellas_como_comprar_visto';
+
+function abrirComoComprar() {
+  document.getElementById('comoComprarOverlay').classList.add('open');
+}
+
+function cerrarComoComprar() {
+  document.getElementById('comoComprarOverlay').classList.remove('open');
+  // Marcar como visto para que no vuelva a salir automático
+  try { localStorage.setItem(COMO_COMPRAR_KEY, '1'); } catch (e) {}
+}
+
+function mostrarComoComprarSiPrimeraVez() {
+  try {
+    const visto = localStorage.getItem(COMO_COMPRAR_KEY);
+    if (!visto) {
+      setTimeout(abrirComoComprar, 1000);
+    }
+  } catch (e) {}
+}
 
 // ===== MODO ADMIN (URL secreta) =====
 function verificarModoAdmin() {
@@ -2007,6 +2316,9 @@ async function init() {
   // Si entró con #admin, abrir el panel directamente
   if (abrirAdminAlCargar) {
     abrirAdmin();
+  } else {
+    // Solo mostrar el modal "Cómo comprar" si NO es el admin entrando
+    mostrarComoComprarSiPrimeraVez();
   }
 }
 
