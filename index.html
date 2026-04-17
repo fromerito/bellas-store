@@ -390,9 +390,68 @@
     color: var(--negro);
   }
 
-  .btn-agregar.en-carrito {
+  /* Controles de cantidad en la card del producto */
+  .cantidad-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background: var(--dorado);
+    border: 1px solid var(--dorado);
+    border-radius: 2px;
+    padding: 0.35rem;
+    gap: 0.5rem;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .cantidad-btn {
+    background: var(--negro);
+    border: none;
+    color: var(--dorado-claro);
+    width: 34px;
+    height: 34px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-family: var(--font-sans);
+    line-height: 1;
+    padding: 0;
+  }
+
+  .cantidad-btn:hover {
+    background: var(--negro-suave);
+    color: var(--blanco-marfil);
+    transform: scale(1.05);
+  }
+
+  .cantidad-btn:active {
+    transform: scale(0.95);
+  }
+
+  .cantidad-display {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 600;
     color: var(--negro);
+    line-height: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .cantidad-display-label {
+    font-family: var(--font-sans);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(10, 10, 10, 0.65);
+    font-weight: 500;
   }
 
   /* Empty state */
@@ -1826,11 +1885,22 @@ function renderProductos() {
   }
 
   cont.innerHTML = lista.map(p => {
-    const enCarrito = state.carrito[p.id];
+    const cantidad = state.carrito[p.id] || 0;
     const inicial = (p.nombre[0] || 'B').toUpperCase();
     const imgHtml = p.imagen
       ? `<img src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" onerror="this.outerHTML='<div class=\\'producto-imagen-placeholder\\'>${inicial}</div>'">`
       : `<div class="producto-imagen-placeholder">${inicial}</div>`;
+
+    const controlHtml = cantidad > 0
+      ? `<div class="cantidad-control">
+           <button class="cantidad-btn" data-minus="${p.id}" aria-label="Disminuir cantidad">−</button>
+           <div class="cantidad-display">
+             <span>${cantidad}</span>
+             <span class="cantidad-display-label">en carrito</span>
+           </div>
+           <button class="cantidad-btn" data-plus="${p.id}" aria-label="Aumentar cantidad">+</button>
+         </div>`
+      : `<button class="btn-agregar" data-add="${p.id}">Agregar al carrito</button>`;
 
     return `
       <article class="producto-card">
@@ -1845,9 +1915,7 @@ function renderProductos() {
             <div class="precio-principal">${fmtUSD(p.precio)}</div>
             <div class="precio-secundario">${fmtCOP(p.precio)} · ${fmtVES(p.precio)}</div>
           </div>
-          <button class="btn-agregar ${enCarrito ? 'en-carrito' : ''}" data-add="${p.id}">
-            ${enCarrito ? `✓ En carrito (${enCarrito})` : 'Agregar al carrito'}
-          </button>
+          ${controlHtml}
         </div>
       </article>
     `;
@@ -1855,6 +1923,12 @@ function renderProductos() {
 
   cont.querySelectorAll('[data-add]').forEach(btn => {
     btn.onclick = () => agregarAlCarrito(parseInt(btn.dataset.add));
+  });
+  cont.querySelectorAll('[data-plus]').forEach(btn => {
+    btn.onclick = () => cambiarCantidad(parseInt(btn.dataset.plus), 1);
+  });
+  cont.querySelectorAll('[data-minus]').forEach(btn => {
+    btn.onclick = () => cambiarCantidad(parseInt(btn.dataset.minus), -1);
   });
 }
 
