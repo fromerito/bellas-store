@@ -1323,9 +1323,11 @@
     justify-content: center;
   }
 
-  .metodo-pago-icono svg {
+  .metodo-pago-icono svg,
+  .metodo-pago-icono img {
     width: 100%;
     height: 100%;
+    object-fit: contain;
   }
 
   .metodo-pago-nombre {
@@ -2257,11 +2259,7 @@
     <!-- Zinli -->
     <div class="metodo-pago-chip">
       <div class="metodo-pago-icono">
-        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="2" y="2" width="60" height="60" rx="14" fill="#1E5AFF"/>
-          <text x="32" y="42" text-anchor="middle" font-family="'Inter', sans-serif" font-size="30" font-weight="700" fill="#ffffff">z</text>
-          <circle cx="42" cy="20" r="2.5" fill="#ffffff"/>
-        </svg>
+        <img src="zinli.png" alt="Zinli" loading="lazy">
       </div>
       <div class="metodo-pago-nombre">Zinli</div>
     </div>
@@ -2269,10 +2267,7 @@
     <!-- Bancolombia -->
     <div class="metodo-pago-chip">
       <div class="metodo-pago-icono">
-        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="2" y="2" width="60" height="60" rx="10" fill="#FDDA24"/>
-          <text x="32" y="44" text-anchor="middle" font-family="'Inter', sans-serif" font-size="38" font-weight="800" fill="#2C2A29" font-style="italic">B</text>
-        </svg>
+        <img src="bancolombia.png" alt="Bancolombia" loading="lazy">
       </div>
       <div class="metodo-pago-nombre">Bancolombia</div>
     </div>
