@@ -43,17 +43,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Parisienne&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --negro: #0a0a0a;
-    --negro-suave: #141414;
-    --dorado: #c9a24d;
-    --dorado-claro: #e8c474;
-    --dorado-oscuro: #8b6b2e;
-    --crema: #e8d4a8;
-    --rosa: #f5e6e8;
-    --blanco-marfil: #faf6ee;
-    --gris-suave: rgba(250, 246, 238, 0.08);
-    --gris-borde: rgba(201, 162, 77, 0.25);
-    --sombra-dorada: 0 20px 60px -20px rgba(201, 162, 77, 0.35);
+    /* === TEMA CLARO === */
+    --negro: #faf6ee;              /* antes fondo principal negro → ahora marfil cálido */
+    --negro-suave: #f3ece0;        /* antes fondo suave → ahora crema tostado */
+    --dorado: #8b6b2e;             /* antes dorado brillante → ahora dorado oscuro (contrasta sobre claro) */
+    --dorado-claro: #a87f3a;       /* antes muy brillante → ahora dorado medio */
+    --dorado-oscuro: #6b4f20;      /* aún más oscuro para acentos fuertes */
+    --crema: #e8d4a8;              /* se mantiene, sirve como acento */
+    --rosa: #f5e6e8;               /* se mantiene, armoniza con marfil */
+    --blanco-marfil: #2a2418;      /* antes era color de texto claro → ahora marrón muy oscuro para texto */
+    --gris-suave: rgba(42, 36, 24, 0.06);
+    --gris-borde: rgba(139, 107, 46, 0.3);
+    --sombra-dorada: 0 20px 60px -20px rgba(139, 107, 46, 0.25);
     --font-display: 'Parisienne', cursive;
     --font-serif: 'Cormorant Garamond', serif;
     --font-sans: 'Inter', sans-serif;
@@ -79,8 +80,8 @@
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(ellipse at 20% 10%, rgba(201, 162, 77, 0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%, rgba(232, 212, 168, 0.05) 0%, transparent 50%);
+      radial-gradient(ellipse at 20% 10%, rgba(245, 230, 232, 0.7) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(232, 212, 168, 0.35) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
   }
@@ -91,7 +92,7 @@
     top: 0;
     z-index: 100;
     backdrop-filter: blur(20px);
-    background: rgba(10, 10, 10, 0.85);
+    background: rgba(250, 246, 238, 0.85);
     border-bottom: 1px solid var(--gris-borde);
     padding: 1rem 2rem;
   }
@@ -108,7 +109,7 @@
   .logo {
     height: 54px;
     width: auto;
-    filter: drop-shadow(0 0 12px rgba(201, 162, 77, 0.3));
+    filter: drop-shadow(0 2px 8px rgba(139, 107, 46, 0.15));
   }
 
   .header-actions {
@@ -136,14 +137,14 @@
 
   .btn-icon:hover {
     background: var(--dorado);
-    color: var(--negro);
+    color: #ffffff;
     border-color: var(--dorado);
     transform: translateY(-1px);
   }
 
   .btn-icon.primary {
     background: linear-gradient(135deg, var(--dorado) 0%, var(--dorado-claro) 100%);
-    color: var(--negro);
+    color: #ffffff;
     border-color: var(--dorado);
     font-weight: 600;
   }
@@ -208,7 +209,7 @@
   .hero-description {
     font-family: var(--font-serif);
     font-style: italic;
-    color: rgba(250, 246, 238, 0.7);
+    color: rgba(42, 36, 24, 0.7);
     font-size: 1.1rem;
     max-width: 600px;
     margin: 0 auto;
@@ -249,7 +250,7 @@
 
   .filter-btn.active {
     background: var(--dorado);
-    color: var(--negro);
+    color: #ffffff;
     border-color: var(--dorado);
     font-weight: 600;
   }
@@ -264,7 +265,7 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: rgba(10, 10, 10, 0.75);
+    background: rgba(250, 246, 238, 0.75);
     border: 1px solid var(--gris-borde);
     color: var(--dorado-claro);
     cursor: pointer;
@@ -278,7 +279,7 @@
 
   .btn-compartir:hover {
     background: var(--dorado);
-    color: var(--negro);
+    color: #ffffff;
     border-color: var(--dorado);
     transform: scale(1.08);
   }
@@ -301,7 +302,7 @@
     max-width: 500px;
     margin: 0 auto 2rem;
     padding: 1rem 1.5rem;
-    background: rgba(20, 20, 20, 0.5);
+    background: rgba(255, 255, 255, 0.5);
     border: 1px solid var(--gris-borde);
     border-radius: 12px;
     position: relative;
@@ -477,7 +478,7 @@
 
   .search-bar input {
     width: 100%;
-    background: rgba(20, 20, 20, 0.6);
+    background: rgba(255, 255, 255, 0.6);
     border: 1px solid var(--gris-borde);
     color: var(--blanco-marfil);
     padding: 0.8rem 1.25rem;
@@ -490,11 +491,11 @@
   .search-bar input:focus {
     outline: none;
     border-color: var(--dorado);
-    background: rgba(20, 20, 20, 0.85);
+    background: rgba(255, 255, 255, 0.85);
   }
 
   .search-bar input::placeholder {
-    color: rgba(250, 246, 238, 0.4);
+    color: rgba(42, 36, 24, 0.4);
   }
 
   /* Grid de productos */
@@ -510,7 +511,7 @@
   }
 
   .producto-card {
-    background: linear-gradient(180deg, rgba(20, 20, 20, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%);
+    background: #ffffff;
     border: 1px solid var(--gris-borde);
     border-radius: 4px;
     overflow: hidden;
@@ -518,12 +519,13 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    box-shadow: 0 2px 10px rgba(139, 107, 46, 0.06);
   }
 
   .producto-card:hover {
     transform: translateY(-4px);
     border-color: var(--dorado);
-    box-shadow: var(--sombra-dorada);
+    box-shadow: 0 12px 30px rgba(139, 107, 46, 0.18);
   }
 
   .producto-imagen {
@@ -560,7 +562,7 @@
     position: absolute;
     top: 0.75rem;
     left: 0.75rem;
-    background: rgba(10, 10, 10, 0.85);
+    background: rgba(250, 246, 238, 0.85);
     color: var(--dorado-claro);
     padding: 0.3rem 0.7rem;
     font-size: 0.7rem;
@@ -611,14 +613,14 @@
   }
 
   .estado-cinta.cinta-agotado {
-    background: rgba(20, 20, 20, 0.9);
-    color: #d4d4d4;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(42, 36, 24, 0.85);
+    color: #faf6ee;
+    border: 1px solid rgba(42, 36, 24, 0.9);
   }
 
   .estado-cinta.cinta-proximamente {
-    background: rgba(201, 162, 77, 0.15);
-    color: var(--dorado-claro);
+    background: rgba(139, 107, 46, 0.12);
+    color: var(--dorado-oscuro);
     border: 1px solid var(--dorado);
   }
 
@@ -628,7 +630,7 @@
     top: 0.75rem;
     left: 0.75rem;
     background: linear-gradient(135deg, var(--dorado) 0%, var(--dorado-claro) 100%);
-    color: var(--negro);
+    color: #ffffff;
     padding: 0.35rem 0.8rem;
     font-size: 0.7rem;
     font-weight: 700;
@@ -673,7 +675,7 @@
 
   .producto-descripcion {
     font-size: 0.85rem;
-    color: rgba(250, 246, 238, 0.6);
+    color: rgba(42, 36, 24, 0.6);
     line-height: 1.5;
     font-weight: 300;
     flex: 1;
@@ -697,7 +699,7 @@
 
   .precio-secundario {
     font-size: 0.8rem;
-    color: rgba(250, 246, 238, 0.55);
+    color: rgba(42, 36, 24, 0.55);
   }
 
   .btn-agregar {
@@ -717,7 +719,7 @@
 
   .btn-agregar:hover {
     background: var(--dorado);
-    color: var(--negro);
+    color: #ffffff;
   }
 
   /* Controles de cantidad en la card del producto */
@@ -767,7 +769,7 @@
     font-family: var(--font-serif);
     font-size: 1.15rem;
     font-weight: 600;
-    color: var(--negro);
+    color: #ffffff;
     line-height: 1;
     display: flex;
     flex-direction: column;
@@ -779,7 +781,7 @@
     font-size: 0.6rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: rgba(10, 10, 10, 0.65);
+    color: rgba(42, 36, 24, 0.65);
     font-weight: 500;
   }
 
@@ -788,7 +790,7 @@
     grid-column: 1 / -1;
     text-align: center;
     padding: 4rem 2rem;
-    color: rgba(250, 246, 238, 0.5);
+    color: rgba(42, 36, 24, 0.5);
     font-family: var(--font-serif);
     font-style: italic;
     font-size: 1.1rem;
@@ -798,7 +800,7 @@
   .cart-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(42, 36, 24, 0.6);
     backdrop-filter: blur(4px);
     opacity: 0;
     pointer-events: none;
@@ -867,7 +869,7 @@
   .cart-empty {
     text-align: center;
     padding: 3rem 1rem;
-    color: rgba(250, 246, 238, 0.5);
+    color: rgba(42, 36, 24, 0.5);
     font-family: var(--font-serif);
     font-style: italic;
   }
@@ -954,7 +956,7 @@
   .cart-item-remove {
     background: transparent;
     border: none;
-    color: rgba(250, 246, 238, 0.4);
+    color: rgba(42, 36, 24, 0.4);
     cursor: pointer;
     font-size: 0.75rem;
     margin-left: auto;
@@ -987,7 +989,7 @@
   }
 
   .cart-total-label {
-    color: rgba(250, 246, 238, 0.6);
+    color: rgba(42, 36, 24, 0.6);
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -1002,7 +1004,7 @@
 
   .cart-total.secundario .cart-total-value {
     font-size: 1rem;
-    color: rgba(250, 246, 238, 0.7);
+    color: rgba(42, 36, 24, 0.7);
   }
 
   .btn-checkout {
@@ -1032,7 +1034,7 @@
 
   .btn-checkout:disabled {
     background: var(--gris-suave);
-    color: rgba(250, 246, 238, 0.3);
+    color: rgba(42, 36, 24, 0.3);
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
@@ -1042,7 +1044,7 @@
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(42, 36, 24, 0.8);
     backdrop-filter: blur(4px);
     display: none;
     align-items: center;
@@ -1094,7 +1096,7 @@
   .modal-tab {
     background: transparent;
     border: none;
-    color: rgba(250, 246, 238, 0.6);
+    color: rgba(42, 36, 24, 0.6);
     padding: 0.75rem 1rem;
     cursor: pointer;
     font-family: var(--font-sans);
@@ -1121,7 +1123,7 @@
     display: block;
     margin-bottom: 0.4rem;
     font-size: 0.8rem;
-    color: rgba(250, 246, 238, 0.7);
+    color: rgba(42, 36, 24, 0.7);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -1130,7 +1132,7 @@
   .form-group select,
   .form-group textarea {
     width: 100%;
-    background: rgba(10, 10, 10, 0.6);
+    background: rgba(250, 246, 238, 0.6);
     border: 1px solid var(--gris-borde);
     color: var(--blanco-marfil);
     padding: 0.7rem 0.9rem;
@@ -1157,7 +1159,7 @@
 
   .btn-primary {
     background: linear-gradient(135deg, var(--dorado) 0%, var(--dorado-claro) 100%);
-    color: var(--negro);
+    color: #ffffff;
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 2px;
@@ -1219,7 +1221,7 @@
 
   .admin-producto-meta {
     font-size: 0.75rem;
-    color: rgba(250, 246, 238, 0.5);
+    color: rgba(42, 36, 24, 0.5);
   }
 
   .admin-producto-actions {
@@ -1297,7 +1299,7 @@
     flex: 1 1 140px;
     max-width: 170px;
     min-height: 110px;
-    background: rgba(20, 20, 20, 0.6);
+    background: #ffffff;
     border: 1px solid var(--gris-borde);
     border-radius: 12px;
     padding: 1rem 0.75rem;
@@ -1307,12 +1309,13 @@
     justify-content: center;
     gap: 0.6rem;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(139, 107, 46, 0.05);
   }
 
   .metodo-pago-chip:hover {
     border-color: var(--dorado);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px -10px rgba(201, 162, 77, 0.4);
+    box-shadow: 0 8px 20px rgba(139, 107, 46, 0.15);
   }
 
   .metodo-pago-icono {
@@ -1344,7 +1347,7 @@
     font-family: var(--font-serif);
     font-style: italic;
     font-size: 0.88rem;
-    color: rgba(250, 246, 238, 0.6);
+    color: rgba(42, 36, 24, 0.6);
     max-width: 500px;
     margin: 0 auto;
     line-height: 1.5;
@@ -1380,7 +1383,7 @@
   .footer-message {
     font-family: var(--font-serif);
     font-style: italic;
-    color: rgba(250, 246, 238, 0.65);
+    color: rgba(42, 36, 24, 0.65);
     font-size: 1rem;
     margin-bottom: 1.5rem;
   }
@@ -1407,7 +1410,7 @@
 
   .footer-copy {
     font-size: 0.75rem;
-    color: rgba(250, 246, 238, 0.3);
+    color: rgba(42, 36, 24, 0.3);
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid var(--gris-suave);
@@ -1441,7 +1444,7 @@
   .como-comprar-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(42, 36, 24, 0.8);
     backdrop-filter: blur(6px);
     display: none;
     align-items: center;
@@ -1498,7 +1501,7 @@
     right: 0.85rem;
     background: transparent;
     border: none;
-    color: rgba(250, 246, 238, 0.5);
+    color: rgba(42, 36, 24, 0.5);
     font-size: 1.4rem;
     cursor: pointer;
     padding: 0.3rem 0.5rem;
@@ -1518,7 +1521,7 @@
   .como-comprar-subtitulo {
     font-family: var(--font-serif);
     font-style: italic;
-    color: rgba(250, 246, 238, 0.7);
+    color: rgba(42, 36, 24, 0.7);
     font-size: 1rem;
   }
 
@@ -1551,7 +1554,7 @@
     height: 46px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--dorado) 0%, var(--dorado-claro) 100%);
-    color: var(--negro);
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1579,7 +1582,7 @@
 
   .paso-descripcion {
     font-size: 0.88rem;
-    color: rgba(250, 246, 238, 0.65);
+    color: rgba(42, 36, 24, 0.65);
     line-height: 1.5;
   }
 
@@ -1590,7 +1593,7 @@
 
   .btn-empezar {
     background: linear-gradient(135deg, var(--dorado) 0%, var(--dorado-claro) 100%);
-    color: var(--negro);
+    color: #ffffff;
     border: none;
     padding: 0.85rem 2.5rem;
     border-radius: 999px;
@@ -1614,9 +1617,9 @@
     bottom: 1.5rem;
     left: 1.5rem;
     z-index: 99;
-    background: var(--negro);
+    background: #ffffff;
     border: 1px solid var(--dorado);
-    color: var(--dorado-claro);
+    color: var(--dorado-oscuro);
     padding: 0.7rem 1.1rem;
     border-radius: 999px;
     font-family: var(--font-sans);
@@ -1627,17 +1630,15 @@
     align-items: center;
     gap: 0.5rem;
     letter-spacing: 0.03em;
-    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 16px rgba(139, 107, 46, 0.2);
     transition: all 0.3s ease;
-    backdrop-filter: blur(8px);
-    background: rgba(10, 10, 10, 0.9);
   }
 
   .btn-ayuda-flotante:hover {
     background: var(--dorado);
-    color: var(--negro);
+    color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: var(--sombra-dorada);
+    box-shadow: 0 6px 20px rgba(139, 107, 46, 0.35);
   }
 
   /* ============================================
@@ -1646,7 +1647,7 @@
   .lightbox-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.88);
+    background: rgba(42, 36, 24, 0.88);
     backdrop-filter: blur(8px);
     display: none;
     align-items: center;
@@ -1685,7 +1686,7 @@
     max-height: 75vh;
     object-fit: contain;
     border-radius: 6px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 20px 60px rgba(42, 36, 24, 0.6);
     background: var(--negro-suave);
   }
 
@@ -1699,7 +1700,7 @@
     font-family: var(--font-serif);
     font-size: 1.35rem;
     font-weight: 500;
-    color: var(--blanco-marfil);
+    color: #faf6ee;
     margin-bottom: 0.25rem;
     letter-spacing: 0.02em;
   }
@@ -1707,12 +1708,12 @@
   .lightbox-precio {
     font-family: var(--font-sans);
     font-size: 1rem;
-    color: var(--dorado-claro);
+    color: #e8c474;
     font-weight: 500;
   }
 
   .lightbox-separador {
-    color: var(--dorado);
+    color: #c9a24d;
     margin: 0 0.5rem;
     opacity: 0.6;
   }
@@ -1724,9 +1725,9 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(10, 10, 10, 0.7);
-    border: 1px solid var(--gris-borde);
-    color: var(--blanco-marfil);
+    background: rgba(250, 246, 238, 0.2);
+    border: 1px solid rgba(250, 246, 238, 0.4);
+    color: #faf6ee;
     font-size: 1.5rem;
     cursor: pointer;
     display: flex;
@@ -1739,7 +1740,7 @@
 
   .lightbox-close:hover {
     background: var(--dorado);
-    color: var(--negro);
+    color: #ffffff;
     border-color: var(--dorado);
     transform: scale(1.08);
   }
@@ -1772,9 +1773,9 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: rgba(10, 10, 10, 0.7);
-    border: 1px solid var(--gris-borde);
-    color: var(--blanco-marfil);
+    background: rgba(250, 246, 238, 0.2);
+    border: 1px solid rgba(250, 246, 238, 0.4);
+    color: #faf6ee;
     font-size: 1.2rem;
     cursor: pointer;
     display: flex;
@@ -1787,7 +1788,7 @@
 
   .lightbox-flecha:hover {
     background: var(--dorado);
-    color: var(--negro);
+    color: #ffffff;
     border-color: var(--dorado);
     transform: translateY(-50%) scale(1.08);
   }
@@ -1818,12 +1819,12 @@
   }
 
   .lightbox-dot.activo {
-    background: var(--dorado);
+    background: #e8c474;
     transform: scale(1.25);
   }
 
   .lightbox-dot:hover {
-    background: var(--dorado-claro);
+    background: #c9a24d;
   }
 
   .lightbox-overlay.single-image .lightbox-dots { display: none; }
@@ -1837,7 +1838,7 @@
     display: flex;
     gap: 0.3rem;
     padding: 0.3rem 0.55rem;
-    background: rgba(10, 10, 10, 0.65);
+    background: rgba(250, 246, 238, 0.65);
     border-radius: 999px;
     backdrop-filter: blur(6px);
     z-index: 2;
@@ -1880,7 +1881,7 @@
     justify-content: center;
     box-shadow:
       0 8px 24px -6px rgba(37, 211, 102, 0.55),
-      0 4px 12px rgba(0, 0, 0, 0.3);
+      0 4px 12px rgba(42, 36, 24, 0.3);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     text-decoration: none;
     color: white;
@@ -1890,7 +1891,7 @@
     transform: scale(1.08);
     box-shadow:
       0 12px 30px -4px rgba(37, 211, 102, 0.7),
-      0 6px 16px rgba(0, 0, 0, 0.35);
+      0 6px 16px rgba(42, 36, 24, 0.35);
   }
 
   .btn-whatsapp-flotante:active {
@@ -1937,7 +1938,7 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease, transform 0.25s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(42, 36, 24, 0.4);
   }
 
   .btn-whatsapp-flotante:hover .tooltip-wa {
@@ -2104,7 +2105,7 @@
       </div>
 
       <div class="tab-panel active" id="tabProductos">
-        <div id="adminSheetStatus" style="padding: 0.75rem 1rem; background: rgba(201,162,77,0.08); border: 1px solid var(--gris-borde); border-radius: 2px; margin-bottom: 1rem; font-size: 0.85rem; color: rgba(250,246,238,0.75);"></div>
+        <div id="adminSheetStatus" style="padding: 0.75rem 1rem; background: rgba(201,162,77,0.08); border: 1px solid var(--gris-borde); border-radius: 2px; margin-bottom: 1rem; font-size: 0.85rem; color: rgba(42, 36, 24, 0.75);"></div>
 
         <div id="adminProductosLista"></div>
 
@@ -2154,7 +2155,7 @@
         <div class="form-group">
           <label>Google Sheet conectado</label>
           <input type="text" id="confSheetUrl" readonly style="opacity:0.7; cursor:not-allowed;">
-          <small style="display:block; margin-top:0.4rem; color:rgba(250,246,238,0.5); font-size:0.75rem; line-height:1.5;">
+          <small style="display:block; margin-top:0.4rem; color: rgba(42, 36, 24, 0.5); font-size:0.75rem; line-height:1.5;">
             📎 Esta URL está fija en el código del sitio. Para cambiarla hay que editar el archivo HTML. Para editar los productos usa Google Sheets directamente.
           </small>
         </div>
@@ -2183,13 +2184,13 @@
 
         <div style="margin-top:2rem; padding-top:1.5rem; border-top: 1px solid var(--gris-borde);">
           <h3 style="font-family: var(--font-serif); color: var(--dorado-claro); margin-bottom: 0.75rem; font-size: 1.2rem;">✨ Cómo editar los productos</h3>
-          <p style="color: rgba(250,246,238,0.7); font-size: 0.85rem; line-height: 1.6;">
+          <p style="color: rgba(42, 36, 24, 0.7); font-size: 0.85rem; line-height: 1.6;">
             Los productos se editan directamente en tu Google Sheet. Abre la hoja desde tu celular o PC, agrega/modifica/elimina filas, guarda los cambios y espera ~5 min para que Google los propague. Luego usa el botón <b>"🔄 Recargar desde Sheet"</b> arriba para ver los cambios al instante.
           </p>
         </div>
 
         <div style="margin-top:1.5rem; padding-top:1rem; border-top: 1px solid var(--gris-borde);">
-          <p style="color: rgba(250,246,238,0.5); font-size: 0.8rem; line-height: 1.5; margin-bottom:0.5rem;">
+          <p style="color: rgba(42, 36, 24, 0.5); font-size: 0.8rem; line-height: 1.5; margin-bottom:0.5rem;">
             Respaldo local (si no quieres usar Sheets):
           </p>
           <div class="form-actions" style="margin-top: 0.5rem;">
@@ -3361,7 +3362,7 @@ function renderAdminProductos() {
   }
 
   if (state.productos.length === 0) {
-    cont.innerHTML = '<p style="color:rgba(250,246,238,0.5); text-align:center; padding: 2rem 0;">Aún no hay productos.</p>';
+    cont.innerHTML = '<p style="color: rgba(42, 36, 24, 0.5); text-align:center; padding: 2rem 0;">Aún no hay productos.</p>';
     return;
   }
 
