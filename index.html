@@ -2458,7 +2458,16 @@ function cargarCarritoGuardado() {
       const id = parseInt(idStr);
       const prod = state.productos.find(p => p.id === id);
       if (prod && !prod.agotado && !prod.proximamente && qty > 0) {
-        carritoFiltrado[id] = qty;
+        // Si hay control de stock, limitar la cantidad al disponible
+        let cantidadFinal = qty;
+        if (prod.cantidad !== null && prod.cantidad !== undefined) {
+          cantidadFinal = Math.min(qty, prod.cantidad);
+          if (cantidadFinal <= 0) {
+            perdidos++;
+            continue;
+          }
+        }
+        carritoFiltrado[id] = cantidadFinal;
       } else {
         perdidos++;
       }
@@ -2689,6 +2698,7 @@ function filasAProductos(rows) {
   const idxImg4 = headers.indexOf('imagen4');
   const idxEstado = headers.indexOf('estado');
   const idxSku = headers.indexOf('sku');
+  const idxCantidad = headers.indexOf('cantidad');
 
   if (idxNombre === -1 || idxPrecio === -1) {
     throw new Error('El Sheet debe tener al menos las columnas: nombre y precio');
@@ -2708,7 +2718,7 @@ function filasAProductos(rows) {
     // Es case-insensitive y acepta varios estados combinados separados por guiones,
     // comas, espacios o barras (ej: "destacado-agotado", "destacado agotado").
     const estadoRaw = idxEstado >= 0 ? norm(fila[idxEstado] || '') : '';
-    const agotado = estadoRaw.includes('agotado');
+    let agotado = estadoRaw.includes('agotado');
     const proximamente = estadoRaw.includes('proximamente');
     const destacado = estadoRaw.includes('destacado');
 
@@ -2725,6 +2735,22 @@ function filasAProductos(rows) {
     // Si la celda está vacía, queda como '' (se maneja al mostrar).
     const sku = idxSku >= 0 ? (fila[idxSku] || '').toString().trim().toUpperCase() : '';
 
+    // Cantidad (stock disponible):
+    //   - null: la columna no existe en el Sheet → no hay control de stock (comportamiento legacy, sin límite)
+    //   - número: es el stock disponible. Si es 0 → agotado automáticamente
+    let cantidad = null;
+    if (idxCantidad >= 0) {
+      const cantStr = (fila[idxCantidad] || '').toString().trim();
+      if (cantStr === '') {
+        cantidad = null; // celda vacía = sin control de stock
+      } else {
+        const parsed = parseInt(cantStr.replace(/[^0-9-]/g, ''), 10);
+        cantidad = isNaN(parsed) ? null : Math.max(0, parsed);
+        // Si la cantidad es 0, marcar como agotado automáticamente
+        if (cantidad === 0) agotado = true;
+      }
+    }
+
     productos.push({
       id: r, // usamos el número de fila como id
       nombre: nombre,
@@ -2734,6 +2760,7 @@ function filasAProductos(rows) {
       imagen: imgPrincipal,         // se mantiene para retrocompatibilidad (catálogo)
       imagenes: imagenes,           // array completo para el lightbox
       sku: sku,
+      cantidad: cantidad,           // null = sin control / número = stock disponible
       agotado: agotado,
       proximamente: proximamente,
       destacado: destacado
@@ -3214,16 +3241,36 @@ function actualizarControlProducto(id) {
 
 // ===== CARRITO =====
 function agregarAlCarrito(id) {
-  state.carrito[id] = (state.carrito[id] || 0) + 1;
+  const p = state.productos.find(x => x.id === id);
+  if (!p) return;
+
+  const nuevaCantidad = (state.carrito[id] || 0) + 1;
+
+  // Control de stock: si el producto tiene cantidad definida y se excede, bloqueamos
+  if (p.cantidad !== null && p.cantidad !== undefined && nuevaCantidad > p.cantidad) {
+    mostrarToast(`⚠️ Solo quedan ${p.cantidad} disponibles de ${p.nombre}`);
+    return;
+  }
+
+  state.carrito[id] = nuevaCantidad;
   actualizarControlProducto(id);
   actualizarCarrito();
   guardarCarrito();
-  const p = state.productos.find(x => x.id === id);
   mostrarToast(`✨ ${p.nombre} agregado al carrito`);
 }
 
 function cambiarCantidad(id, delta) {
+  const p = state.productos.find(x => x.id === id);
+  if (!p) return;
+
   const nueva = (state.carrito[id] || 0) + delta;
+
+  // Bloqueo si se está intentando aumentar más allá del stock
+  if (delta > 0 && p.cantidad !== null && p.cantidad !== undefined && nueva > p.cantidad) {
+    mostrarToast(`⚠️ Solo quedan ${p.cantidad} disponibles`);
+    return;
+  }
+
   if (nueva <= 0) {
     delete state.carrito[id];
   } else {
@@ -3323,6 +3370,31 @@ function generarMensajeWhatsapp() {
 
 function irACheckout() {
   if (Object.keys(state.carrito).length === 0) return;
+
+  // Verificación final de stock antes de ir a WhatsApp.
+  // Si alguna cantidad excede el stock (ej: cambió desde la última vez que se cargó),
+  // se ajusta automáticamente y se avisa al usuario.
+  let ajustes = [];
+  for (const [idStr, qty] of Object.entries(state.carrito)) {
+    const id = parseInt(idStr);
+    const p = state.productos.find(x => x.id === id);
+    if (!p) continue;
+    if (p.cantidad !== null && p.cantidad !== undefined && qty > p.cantidad) {
+      ajustes.push(`${p.nombre}: ${qty} → ${p.cantidad}`);
+      if (p.cantidad === 0) {
+        delete state.carrito[id];
+      } else {
+        state.carrito[id] = p.cantidad;
+      }
+    }
+  }
+  if (ajustes.length > 0) {
+    guardarCarrito();
+    actualizarCarrito();
+    mostrarToast(`⚠️ Ajustamos cantidades por stock disponible`);
+    return; // No enviar inmediatamente, dejar que revise el carrito ajustado
+  }
+
   const mensaje = generarMensajeWhatsapp();
   const url = `https://wa.me/${state.config.whatsapp}?text=${encodeURIComponent(mensaje)}`;
   window.open(url, '_blank');
