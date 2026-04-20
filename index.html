@@ -673,6 +673,16 @@
     letter-spacing: 0.01em;
   }
 
+  .producto-sku {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    color: var(--dorado-oscuro);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    margin-top: -0.2rem;
+    opacity: 0.85;
+  }
+
   .producto-descripcion {
     font-size: 0.85rem;
     color: rgba(42, 36, 24, 0.6);
@@ -1705,6 +1715,15 @@
     letter-spacing: 0.02em;
   }
 
+  .lightbox-sku {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    color: #e8c474;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.35rem;
+    opacity: 0.9;
+  }
+
   .lightbox-precio {
     font-family: var(--font-sans);
     font-size: 1rem;
@@ -2376,6 +2395,7 @@
     <img class="lightbox-imagen" id="lightboxImg" src="" alt="">
     <div class="lightbox-info">
       <div class="lightbox-nombre" id="lightboxNombre"></div>
+      <div class="lightbox-sku" id="lightboxSku" style="display: none;"></div>
       <div class="lightbox-precio" id="lightboxPrecio"></div>
       <div class="lightbox-dots" id="lightboxDots"></div>
     </div>
@@ -2668,6 +2688,7 @@ function filasAProductos(rows) {
   const idxImg3 = headers.indexOf('imagen3');
   const idxImg4 = headers.indexOf('imagen4');
   const idxEstado = headers.indexOf('estado');
+  const idxSku = headers.indexOf('sku');
 
   if (idxNombre === -1 || idxPrecio === -1) {
     throw new Error('El Sheet debe tener al menos las columnas: nombre y precio');
@@ -2700,6 +2721,10 @@ function filasAProductos(rows) {
       idxImg4 >= 0 ? (fila[idxImg4] || '').trim() : ''
     ].filter(url => url.length > 0);
 
+    // SKU: normalizado a mayúsculas, sin espacios internos.
+    // Si la celda está vacía, queda como '' (se maneja al mostrar).
+    const sku = idxSku >= 0 ? (fila[idxSku] || '').toString().trim().toUpperCase() : '';
+
     productos.push({
       id: r, // usamos el número de fila como id
       nombre: nombre,
@@ -2708,6 +2733,7 @@ function filasAProductos(rows) {
       precio: precio,
       imagen: imgPrincipal,         // se mantiene para retrocompatibilidad (catálogo)
       imagenes: imagenes,           // array completo para el lightbox
+      sku: sku,
       agotado: agotado,
       proximamente: proximamente,
       destacado: destacado
@@ -3110,6 +3136,7 @@ function renderProductos() {
         </div>
         <div class="producto-info">
           <h3 class="producto-nombre">${escapeHtml(p.nombre)}</h3>
+          ${p.sku ? `<div class="producto-sku">${escapeHtml(p.sku)}</div>` : ''}
           <p class="producto-descripcion">${escapeHtml(p.descripcion || '')}</p>
           <div class="precios">
             <div class="precio-principal">${fmtUSD(p.precio)}</div>
@@ -3280,7 +3307,9 @@ function generarMensajeWhatsapp() {
     if (!p) return;
     const subtotal = p.precio * qty;
     total += subtotal;
-    lineas.push(`• ${qty}x ${p.nombre} — ${fmtUSD(subtotal)}`);
+    // Incluir SKU entre corchetes si el producto lo tiene
+    const skuTxt = p.sku ? ` [${p.sku}]` : '';
+    lineas.push(`• ${qty}x ${p.nombre}${skuTxt} — ${fmtUSD(subtotal)}`);
   });
 
   lineas.push('');
@@ -3672,6 +3701,7 @@ function obtenerImagenes(producto) {
 function abrirLightbox(producto) {
   const overlay = document.getElementById('lightboxOverlay');
   const nombre = document.getElementById('lightboxNombre');
+  const sku = document.getElementById('lightboxSku');
   const precio = document.getElementById('lightboxPrecio');
 
   const imgs = obtenerImagenes(producto);
@@ -3681,6 +3711,15 @@ function abrirLightbox(producto) {
   lightboxState.indice = 0;
 
   nombre.textContent = producto.nombre;
+
+  // Mostrar SKU solo si el producto lo tiene
+  if (producto.sku) {
+    sku.textContent = producto.sku;
+    sku.style.display = 'block';
+  } else {
+    sku.style.display = 'none';
+  }
+
   precio.innerHTML = `${fmtUSD(producto.precio)}<span class="lightbox-separador">·</span>${fmtCOP(producto.precio)}<span class="lightbox-separador">·</span>${fmtVES(producto.precio)}`;
 
   // Marca "single-image" oculta flechas y dots cuando solo hay 1 imagen
