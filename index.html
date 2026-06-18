@@ -2710,16 +2710,21 @@ function filasAProductos(rows) {
     const nombre = (fila[idxNombre] || '').trim();
     if (!nombre) continue; // saltar filas vacías
 
-    const precioStr = (fila[idxPrecio] || '0').toString().replace(/[^0-9.,]/g, '').replace(',', '.');
-    const precio = parseFloat(precioStr);
-    if (isNaN(precio)) continue;
+    // Si el precio está vacío, no es un número, o es 0/negativo,
+    // marcamos el producto como "próximamente" para que se muestre sin botón comprar
+    // (en vez de aparecer con precio $0.00).
+    const precioRaw = (fila[idxPrecio] || '').toString().trim();
+    const precioStr = precioRaw.replace(/[^0-9.,]/g, '').replace(',', '.');
+    const precioParsed = parseFloat(precioStr);
+    const precioFaltante = precioRaw === '' || isNaN(precioParsed) || precioParsed <= 0;
+    const precio = precioFaltante ? 0 : precioParsed;
 
     // Parsear la columna 'estado' → convertimos a flags booleanos.
     // Es case-insensitive y acepta varios estados combinados separados por guiones,
     // comas, espacios o barras (ej: "destacado-agotado", "destacado agotado").
     const estadoRaw = idxEstado >= 0 ? norm(fila[idxEstado] || '') : '';
     let agotado = estadoRaw.includes('agotado');
-    const proximamente = estadoRaw.includes('proximamente');
+    const proximamente = estadoRaw.includes('proximamente') || precioFaltante;
     const destacado = estadoRaw.includes('destacado');
 
     // Recolectar hasta 4 imágenes en orden, ignorando celdas vacías.
@@ -3166,8 +3171,10 @@ function renderProductos() {
           ${p.sku ? `<div class="producto-sku">${escapeHtml(p.sku)}</div>` : ''}
           <p class="producto-descripcion">${escapeHtml(p.descripcion || '')}</p>
           <div class="precios">
-            <div class="precio-principal">${fmtUSD(p.precio)}</div>
-            <div class="precio-secundario">${fmtCOP(p.precio)} · ${fmtVES(p.precio)}</div>
+            ${p.precio > 0
+              ? `<div class="precio-principal">${fmtUSD(p.precio)}</div>
+                 <div class="precio-secundario">${fmtCOP(p.precio)} · ${fmtVES(p.precio)}</div>`
+              : `<div class="precio-principal">Precio próximo</div>`}
           </div>
           <div class="producto-control-wrap">${controlHtml}</div>
         </div>
@@ -3792,7 +3799,9 @@ function abrirLightbox(producto) {
     sku.style.display = 'none';
   }
 
-  precio.innerHTML = `${fmtUSD(producto.precio)}<span class="lightbox-separador">·</span>${fmtCOP(producto.precio)}<span class="lightbox-separador">·</span>${fmtVES(producto.precio)}`;
+  precio.innerHTML = producto.precio > 0
+    ? `${fmtUSD(producto.precio)}<span class="lightbox-separador">·</span>${fmtCOP(producto.precio)}<span class="lightbox-separador">·</span>${fmtVES(producto.precio)}`
+    : `Precio próximo`;
 
   // Marca "single-image" oculta flechas y dots cuando solo hay 1 imagen
   overlay.classList.toggle('single-image', imgs.length === 1);
