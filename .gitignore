@@ -1,0 +1,5 @@
+# Claude Code internal state
+.claude/
+
+# Snapshots locales del Sheet (descargas temporales)
+.sheet_snapshot.csv
