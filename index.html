@@ -2694,10 +2694,103 @@
     background: var(--a-err-soft);
   }
 
-  /* ===== Botón "Nuevo producto" ===== */
-  #adminModal #btnNuevoContainer {
-    margin-top: 1.25rem;
-    justify-content: flex-end;
+  /* ===== Stats + acción primaria en una fila ===== */
+  #adminModal #adminStatsRow {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+    margin-bottom: 1.25rem;
+  }
+  #adminModal #adminStatsRow #adminStats {
+    margin-bottom: 0 !important;
+    display: flex !important;
+    align-items: center;
+  }
+  #adminModal #adminStatsRow #btnNuevoProducto {
+    flex-shrink: 0;
+    padding-left: 1.35rem !important;
+    padding-right: 1.35rem !important;
+    white-space: nowrap;
+  }
+  @media (max-width: 640px) {
+    #adminModal #adminStatsRow { flex-direction: column; }
+    #adminModal #adminStatsRow #btnNuevoProducto { width: 100%; }
+  }
+
+  /* ===== Paginación ===== */
+  #adminModal #adminPaginacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 1.5rem;
+    padding: 1rem 1.2rem;
+    background: var(--a-surface);
+    border: 1px solid var(--a-border);
+    border-radius: var(--a-r);
+    font-family: var(--a-font-ui);
+    font-size: 0.85rem;
+    color: var(--a-text-2);
+  }
+  #adminModal .paginacion-info {
+    font-family: var(--a-font-ui);
+    color: var(--a-text-2);
+  }
+  #adminModal .paginacion-info b {
+    font-family: var(--a-font-mono);
+    font-feature-settings: 'tnum';
+    color: var(--a-text);
+    font-weight: 600;
+    margin: 0 0.1rem;
+  }
+  #adminModal .paginacion-controles {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  #adminModal .paginacion-btn {
+    background: var(--a-bg);
+    border: 1px solid var(--a-border);
+    color: var(--a-text-2);
+    font-family: var(--a-font-ui);
+    font-size: 0.84rem;
+    font-weight: 500;
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--a-r-sm);
+    cursor: pointer;
+    transition: all .15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 38px;
+    justify-content: center;
+  }
+  #adminModal .paginacion-btn:hover {
+    background: var(--a-surface-2);
+    border-color: var(--a-border-strong);
+    color: var(--a-text);
+  }
+  #adminModal .paginacion-btn.activo {
+    background: var(--a-text);
+    border-color: var(--a-text);
+    color: var(--a-bg);
+  }
+  #adminModal .paginacion-btn:disabled {
+    background: var(--a-surface-2);
+    color: var(--a-text-3);
+    cursor: not-allowed;
+    border-color: var(--a-border);
+  }
+  #adminModal .paginacion-btn:disabled:hover {
+    background: var(--a-surface-2);
+    border-color: var(--a-border);
+    color: var(--a-text-3);
+  }
+  #adminModal .paginacion-puntos {
+    color: var(--a-text-3);
+    padding: 0 0.3rem;
+    font-family: var(--a-font-mono);
   }
 
   /* ===== Formulario producto ===== */
@@ -3283,13 +3376,13 @@
           </label>
           <button class="btn-secondary" id="btnRefreshAdmin" title="Recargar desde el Sheet">🔄</button>
         </div>
-        <div id="adminStats" style="display:none; padding: 0.6rem 0.9rem; background: rgba(201,162,77,0.05); border-radius: 2px; margin-bottom: 0.85rem; font-size: 0.78rem; color: rgba(42, 36, 24, 0.65);"></div>
-
-        <div id="adminProductosLista"></div>
-
-        <div class="form-actions" id="btnNuevoContainer">
+        <div id="adminStatsRow" style="display:none;">
+          <div id="adminStats" style="padding: 0.6rem 0.9rem; background: rgba(201,162,77,0.05); border-radius: 2px; font-size: 0.78rem; color: rgba(42, 36, 24, 0.65); flex: 1;"></div>
           <button class="btn-primary" id="btnNuevoProducto">+ Nuevo producto</button>
         </div>
+
+        <div id="adminProductosLista"></div>
+        <div id="adminPaginacion" style="display:none;"></div>
 
         <div id="formProductoContainer" style="display:none; margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--gris-borde);">
           <h3 style="font-family: var(--font-serif); margin-bottom: 1rem; color: var(--dorado-claro);" id="formProductoTitulo">Nuevo producto</h3>
@@ -4653,6 +4746,8 @@ state.adminFiltroCategoria = '';
 state.adminFiltros = { sinFoto: false, sinStock: false, sinPrecio: false };
 state.adminOrden = 'nombre';
 state.adminLoggedIn = false;
+state.adminPagina = 1;
+const ADMIN_POR_PAGINA = 20;
 
 // Llamada genérica al backend. Usa text/plain para evitar preflight CORS.
 async function gasCall(action, extra) {
@@ -4820,7 +4915,8 @@ function renderAdminProductos() {
   const sinStockTotal  = state.adminProductos.filter(p => noArch(p) && sinStock(p)).length;
   const sinFotoTotal   = state.adminProductos.filter(p => noArch(p) && sinFoto(p)).length;
   const sinPrecioTotal = state.adminProductos.filter(p => noArch(p) && sinPrecio(p)).length;
-  statsEl.style.display = 'block';
+  const statsRow = document.getElementById('adminStatsRow');
+  if (statsRow) statsRow.style.display = 'flex';
   statsEl.innerHTML = `📊 <b>${activos}</b> activos · <b>${archivados}</b> archivados · <b>${sinStockTotal}</b> sin stock · <b>${sinFotoTotal}</b> sin foto · <b>${sinPrecioTotal}</b> sin precio`;
 
   // Counts por categoría (sobre productos no archivados) para alimentar las pills
@@ -4897,12 +4993,25 @@ function renderAdminProductos() {
   };
   lista.sort(comparadores[state.adminOrden] || comparadores.nombre);
 
+  const pagEl = document.getElementById('adminPaginacion');
+
   if (lista.length === 0) {
     cont.innerHTML = '<p style="text-align:center; padding: 2rem 0; color: rgba(42, 36, 24, 0.5);">No hay productos que coincidan.</p>';
+    if (pagEl) pagEl.style.display = 'none';
     return;
   }
 
-  cont.innerHTML = lista.map(p => {
+  // Paginación: calculamos página actual y rango de productos a mostrar
+  const totalItems  = lista.length;
+  const totalPaginas = Math.max(1, Math.ceil(totalItems / ADMIN_POR_PAGINA));
+  // Clampeamos la página actual al rango válido (los filtros pueden reducir el total)
+  if (state.adminPagina > totalPaginas) state.adminPagina = totalPaginas;
+  if (state.adminPagina < 1) state.adminPagina = 1;
+  const inicio = (state.adminPagina - 1) * ADMIN_POR_PAGINA;
+  const fin    = Math.min(inicio + ADMIN_POR_PAGINA, totalItems);
+  const listaPag = lista.slice(inicio, fin);
+
+  cont.innerHTML = listaPag.map(p => {
     const estadoRaw = (p.estado || '').toLowerCase();
     const esArchivado = /archivado/.test(estadoRaw);
     const cantidad = String(p.cantidad || '').trim();
@@ -4958,6 +5067,60 @@ function renderAdminProductos() {
   cont.querySelectorAll('[data-arch]').forEach(b => b.onclick = () => archivarProducto(parseInt(b.dataset.arch)));
   cont.querySelectorAll('[data-quick-precio]').forEach(inp => wireQuickEdit(inp, 'precio'));
   cont.querySelectorAll('[data-quick-stock]').forEach(inp =>  wireQuickEdit(inp, 'cantidad'));
+
+  // ===== Paginación =====
+  if (pagEl) {
+    if (totalPaginas <= 1) {
+      pagEl.style.display = 'none';
+    } else {
+      pagEl.style.display = 'flex';
+      pagEl.innerHTML = renderPaginacionHTML(state.adminPagina, totalPaginas, inicio + 1, fin, totalItems);
+      pagEl.querySelectorAll('[data-pag]').forEach(btn => {
+        btn.onclick = () => {
+          const n = parseInt(btn.dataset.pag, 10);
+          if (isNaN(n) || n === state.adminPagina) return;
+          state.adminPagina = n;
+          renderAdminProductos();
+          // Scroll suave al inicio de la lista para no quedar al final
+          document.getElementById('adminProductosLista').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+      });
+    }
+  }
+}
+
+// Renderiza los controles de paginación: info de rango + prev/núm/next.
+// Estilo "Notion/Linear": muestra 1, ..., n-1, n, n+1, ..., total con elipsis si hace falta.
+function renderPaginacionHTML(actual, total, desde, hasta, items) {
+  const btns = [];
+  btns.push(`<button class="paginacion-btn" data-pag="${actual - 1}" ${actual === 1 ? 'disabled' : ''} aria-label="Página anterior">‹</button>`);
+
+  // Generamos los números de página con elipsis si son muchas
+  const paginas = [];
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) paginas.push(i);
+  } else {
+    paginas.push(1);
+    if (actual > 3) paginas.push('...');
+    const start = Math.max(2, actual - 1);
+    const end   = Math.min(total - 1, actual + 1);
+    for (let i = start; i <= end; i++) paginas.push(i);
+    if (actual < total - 2) paginas.push('...');
+    paginas.push(total);
+  }
+  paginas.forEach(p => {
+    if (p === '...') {
+      btns.push('<span class="paginacion-puntos">…</span>');
+    } else {
+      btns.push(`<button class="paginacion-btn ${p === actual ? 'activo' : ''}" data-pag="${p}">${p}</button>`);
+    }
+  });
+  btns.push(`<button class="paginacion-btn" data-pag="${actual + 1}" ${actual === total ? 'disabled' : ''} aria-label="Página siguiente">›</button>`);
+
+  return `
+    <span class="paginacion-info">Mostrando <b>${desde}</b>–<b>${hasta}</b> de <b>${items}</b> productos</span>
+    <div class="paginacion-controles">${btns.join('')}</div>
+  `;
 }
 
 // Enlaza un input de edición rápida con su handler de guardado.
@@ -5318,8 +5481,12 @@ document.getElementById('loginPassword').addEventListener('keydown', (e) => {
 document.getElementById('btnLogoutAdmin').onclick = adminLogout;
 
 // === Toolbar admin (buscar + foto + orden + ver archivados + refresh) ===
+// Helper: cualquier cambio de filtro/orden vuelve a página 1
+function adminResetPagina() { state.adminPagina = 1; }
+
 document.getElementById('adminBuscar').oninput = (e) => {
   state.adminBusqueda = e.target.value;
+  adminResetPagina();
   renderAdminProductos();
 };
 // Chips de filtros rápidos (multifiltro toggleable)
@@ -5327,19 +5494,23 @@ document.querySelectorAll('#adminFiltrosRapidos .filtro-chip').forEach(chip => {
   chip.onclick = () => {
     const key = chip.dataset.filtro;
     state.adminFiltros[key] = !state.adminFiltros[key];
+    adminResetPagina();
     renderAdminProductos();
   };
 });
 document.getElementById('filtroClear').onclick = () => {
   state.adminFiltros = { sinFoto: false, sinStock: false, sinPrecio: false };
+  adminResetPagina();
   renderAdminProductos();
 };
 document.getElementById('adminOrden').onchange = (e) => {
   state.adminOrden = e.target.value;
+  adminResetPagina();
   renderAdminProductos();
 };
 document.getElementById('adminVerArchivados').onchange = (e) => {
   state.adminVerArchivados = e.target.checked;
+  adminResetPagina();
   renderAdminProductos();
 };
 document.getElementById('btnRefreshAdmin').onclick = () => cargarAdminProductos();
@@ -5348,6 +5519,7 @@ document.getElementById('btnRefreshAdmin').onclick = () => cargarAdminProductos(
 document.querySelectorAll('#adminCategoriasPills .cat-pill').forEach(pill => {
   pill.onclick = () => {
     state.adminFiltroCategoria = pill.dataset.cat;
+    adminResetPagina();
     renderAdminProductos();
   };
 });
