@@ -19,17 +19,45 @@ archivar** productos sin que tu amiga tenga que abrir el Sheet nunca más.
 3. Copia el contenido completo de `apps-script/Code.gs` de este repo y pégalo ahí.
 4. Guarda con `Ctrl+S` (o el ícono de disquete).
 
-### 3. Configurar la contraseña de administración
-1. En el menú izquierdo del editor, clic en el ⚙️ (**Configuración del proyecto**).
-2. Baja hasta la sección **Propiedades de la secuencia de comandos** (Script Properties).
-3. Clic en **Editar propiedades de la secuencia de comandos**.
-4. Clic en **Añadir propiedad** y crea:
-   - **Propiedad:** `ADMIN_PASSWORD`
-   - **Valor:** una contraseña fuerte (la usarás para entrar al panel admin)
-5. Clic en **Guardar propiedades de la secuencia de comandos**.
+### 3. Configurar las Script Properties
 
-> 💡 Esta contraseña la compartes con tu amiga. Si alguna vez se filtra,
-> vuelves aquí y la cambias en 10 segundos.
+En el menú izquierdo del editor, clic en el ⚙️ (**Configuración del proyecto**).
+Baja hasta la sección **Propiedades de la secuencia de comandos** (Script Properties)
+y crea estas 4 propiedades:
+
+| Propiedad | Valor | Para qué sirve |
+|---|---|---|
+| `ADMIN_PASSWORD` | Una contraseña fuerte | Login del panel admin |
+| `GITHUB_TOKEN` | El PAT que generas en el paso 3.1 | Para que el GAS suba imágenes al repo |
+| `GITHUB_REPO` | `fromerito/bellas-store` | Repo donde se guardan las fotos |
+| `GITHUB_BRANCH` | `main` (opcional, default `main`) | Rama del repo |
+
+Guarda las propiedades.
+
+> 💡 La `ADMIN_PASSWORD` se la compartes con tu amiga. Si se filtra, vuelves
+> aquí y la cambias en 10 segundos. El `GITHUB_TOKEN` nunca sale de esta
+> pantalla — tu amiga nunca lo ve.
+
+#### 3.1 Generar el PAT de GitHub (Personal Access Token)
+
+El PAT es el "permiso" que el GAS usa para subir imágenes a tu repo. Lo creas
+una sola vez:
+
+1. Abre https://github.com/settings/personal-access-tokens
+2. Clic en **Generate new token → Fine-grained personal access token**.
+3. Completa el formulario:
+   - **Token name:** `Bellas admin upload` (o lo que quieras)
+   - **Expiration:** elige `1 year` (renovarás una vez al año)
+   - **Repository access:** **Only select repositories** → elige `fromerito/bellas-store`
+   - **Repository permissions:** baja hasta **Contents** → cambia a **Read and write**
+4. Clic en **Generate token** (al final de la página).
+5. Aparece el token, algo como `github_pat_11AAA...`. **Cópialo ahora**, porque
+   no podrás verlo de nuevo.
+6. Pégalo como valor de `GITHUB_TOKEN` en el paso anterior.
+
+> ⚠️ Este token tiene permiso de escritura sobre tu repo. **No lo compartas**
+> ni lo pegues en código que se sube al repo. El GAS lo guarda en Script
+> Properties (privado de tu cuenta) — ese es el único lugar donde debería estar.
 
 ### 4. Desplegar como Web App
 1. Esquina superior derecha → botón azul **Implementar → Nueva implementación**.
@@ -76,12 +104,29 @@ Si cambio algo en `Code.gs`:
 
 ---
 
+## 🔁 Renovar el PAT cuando vence
+
+Si configuraste expiración de 1 año, GitHub te enviará un email cuando se
+acerque la fecha. Para renovarlo:
+
+1. Ve a https://github.com/settings/personal-access-tokens
+2. Encuentra el token (`Bellas admin upload`).
+3. Clic en su nombre → **Regenerate token** (o crea uno nuevo si prefieres).
+4. Copia el nuevo valor.
+5. Ve al editor de Apps Script → ⚙️ Configuración del proyecto → Script Properties.
+6. Edita `GITHUB_TOKEN` y pega el nuevo valor.
+7. Guarda. Listo, la subida de imágenes vuelve a funcionar.
+
 ## 🛠️ Solución de problemas
 
 | Síntoma | Posible causa |
 |---|---|
 | "Password incorrecta" en el panel | La password del panel no coincide con `ADMIN_PASSWORD` del Script Property. Revisa ambos. |
 | "ADMIN_PASSWORD no configurado" | Te saltaste el paso 3. Vuelve a configurarlo. |
-| Los cambios no aparecen en el sitio | El sitio público lee del CSV publicado, que Google cachea ~5 min. Espera o usa "🔄 Recargar desde Sheet" en el panel. |
+| Los cambios no aparecen en el sitio | El sitio público lee del CSV publicado, que Google cachea ~5 min. Espera o usa "🔄 Recargar catálogo público" en el panel. |
+| "GitHub PUT 401" al subir una imagen | El `GITHUB_TOKEN` vencio o es inválido. Genera uno nuevo (ver sección "Renovar el PAT"). |
+| "GitHub PUT 403" al subir una imagen | El PAT no tiene permiso de "Contents: Read and write" sobre el repo. Edita el token y agrega el permiso. |
+| "GitHub PUT 422" al subir una imagen | El path no existe en la rama configurada. Verifica `GITHUB_BRANCH`. |
+| "Faltan GITHUB_TOKEN o GITHUB_REPO" | No configuraste esas Script Properties. Revisa el paso 3. |
 | Error CORS en consola del navegador | Verifica que desplegaste con "Quién tiene acceso: Cualquiera". |
 | "Authorization required" al testear | Hiciste deploy con "Ejecutar como: Usuario que accede" en vez de "Yo". Re-deploya. |

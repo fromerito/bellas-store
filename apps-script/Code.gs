@@ -21,6 +21,25 @@ const COLUMNAS = [
   'estado', 'sku', 'cantidad'
 ];
 
+// Mapeo de nombre de categoría → slug para construir la ruta de la imagen
+// dentro del repo (fotos/<slug>/<SKU>.jpg). Tiene que coincidir con el
+// frontend (CATEGORIA_SLUGS en index.html).
+const CATEGORIA_SLUGS = {
+  'Maquillaje': 'maquillaje',
+  'Skin Care':  'skin-care',
+  'Cabello':    'cabello',
+  'Accesorios': 'accesorios',
+  'Perfume':    'perfume',
+  'Vestimenta': 'vestimenta'
+};
+
+// Sufijos de archivo según el slot de imagen (0 = principal, 1/2/3 = adicionales)
+const SLOT_SUFIJOS = ['', '-b', '-c', '-d'];
+
+// Dominio público donde GitHub Pages sirve los archivos. Usado para construir
+// la URL final que se guarda en el Sheet.
+const PUBLIC_DOMAIN = 'https://bellassc.store';
+
 /**
  * Punto de entrada para POST. Toda la API entra por aquí.
  * El body se envía como text/plain con JSON adentro (evita preflight CORS).
@@ -42,6 +61,7 @@ function doPost(e) {
     if (action === 'create')  return jsonResponse(crearProducto(body.producto));
     if (action === 'update')  return jsonResponse(actualizarProducto(body.id, body.producto));
     if (action === 'archive') return jsonResponse(archivarProducto(body.id));
+    if (action === 'upload')  return jsonResponse(subirImagen(body));
 
     return jsonResponse({ ok: false, error: 'Acción desconocida: ' + action });
   } catch (err) {
@@ -177,4 +197,104 @@ function archivarProducto(id) {
 
   sheet.getRange(fila, idx.estado + 1).setValue('archivado');
   return { ok: true, id: fila };
+}
+
+/**
+ * Sube una imagen al repo de GitHub usando la Contents API.
+ * El archivo se guarda en fotos/<slug-categoria>/<SKU><sufijo>.<ext>
+ * y se devuelve la URL pública (servida por GitHub Pages).
+ *
+ * Espera en el body:
+ *   categoria: 'Maquillaje' | 'Skin Care' | ... (nombre exacto del Sheet)
+ *   sku:       'MAQ-0001'
+ *   ext:       'jpg' | 'png' | 'webp' (lowercase)
+ *   slot:      0 = principal, 1 = -b, 2 = -c, 3 = -d
+ *   content:   base64 del archivo (sin prefijo data:...)
+ *
+ * Requiere en Script Properties:
+ *   GITHUB_TOKEN  → PAT fine-grained con permiso 'Contents: read & write' sobre el repo
+ *   GITHUB_REPO   → 'fromerito/bellas-store' (owner/repo)
+ *   GITHUB_BRANCH → 'main' (opcional, default 'main')
+ */
+function subirImagen(body) {
+  const props = PropertiesService.getScriptProperties();
+  const token  = props.getProperty('GITHUB_TOKEN');
+  const repo   = props.getProperty('GITHUB_REPO');
+  const branch = props.getProperty('GITHUB_BRANCH') || 'main';
+
+  if (!token || !repo) {
+    return { ok: false, error: 'Faltan GITHUB_TOKEN o GITHUB_REPO en Script Properties' };
+  }
+
+  const categoria = String(body.categoria || '').trim();
+  const sku       = String(body.sku || '').trim().toUpperCase();
+  const ext       = String(body.ext || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const slot      = parseInt(body.slot, 10) || 0;
+  const content   = String(body.content || '');
+
+  if (!CATEGORIA_SLUGS[categoria]) {
+    return { ok: false, error: 'Categoría inválida: ' + categoria };
+  }
+  if (!/^[A-Z]{3}-\d{4}$/.test(sku)) {
+    return { ok: false, error: 'SKU inválido (formato esperado: XXX-NNNN)' };
+  }
+  if (!['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
+    return { ok: false, error: 'Extensión no permitida: ' + ext };
+  }
+  if (slot < 0 || slot > 3) {
+    return { ok: false, error: 'Slot inválido (0-3)' };
+  }
+  if (!content) {
+    return { ok: false, error: 'Falta el contenido del archivo' };
+  }
+
+  const slug = CATEGORIA_SLUGS[categoria];
+  const sufijo = SLOT_SUFIJOS[slot];
+  const path = `fotos/${slug}/${sku}${sufijo}.${ext}`;
+  const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
+
+  // Si el archivo ya existe, necesitamos su SHA para sobrescribir.
+  let existingSha = null;
+  const getRes = UrlFetchApp.fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}`, {
+    method: 'get',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    },
+    muteHttpExceptions: true
+  });
+  if (getRes.getResponseCode() === 200) {
+    existingSha = JSON.parse(getRes.getContentText()).sha;
+  } else if (getRes.getResponseCode() !== 404) {
+    return { ok: false, error: 'GitHub GET ' + getRes.getResponseCode() + ': ' + getRes.getContentText().substring(0, 200) };
+  }
+
+  const payload = {
+    message: `admin: ${existingSha ? 'reemplaza' : 'agrega'} ${path}`,
+    content: content,
+    branch: branch
+  };
+  if (existingSha) payload.sha = existingSha;
+
+  const putRes = UrlFetchApp.fetch(apiUrl, {
+    method: 'put',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    },
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  });
+  const putCode = putRes.getResponseCode();
+  if (putCode < 200 || putCode >= 300) {
+    return { ok: false, error: 'GitHub PUT ' + putCode + ': ' + putRes.getContentText().substring(0, 200) };
+  }
+
+  // Bust de cache del navegador: agregamos timestamp para que la imagen
+  // se vea actualizada incluso si se reemplazó.
+  const url = `${PUBLIC_DOMAIN}/${path}?v=${Date.now()}`;
+  return { ok: true, url: url, path: path, replaced: !!existingSha };
 }

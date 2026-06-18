@@ -1406,6 +1406,36 @@
     cursor: pointer;
   }
 
+  /* Input de URL con botón "Subir" al lado */
+  .img-input-wrap {
+    display: flex;
+    gap: 0.4rem;
+    align-items: stretch;
+  }
+  .img-input-wrap input { flex: 1; }
+  .btn-upload-img {
+    background: var(--negro-suave);
+    border: 1px solid var(--gris-borde);
+    color: var(--dorado-oscuro);
+    padding: 0 0.85rem;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+  .btn-upload-img:hover { border-color: var(--dorado); color: var(--dorado); }
+  .btn-upload-img:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .img-upload-status {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.76rem;
+  }
+  .img-upload-status.subiendo { color: var(--dorado-claro); }
+  .img-upload-status.ok { color: rgba(37, 211, 102, 0.9); }
+  .img-upload-status.error { color: #b94a3b; }
+
   /* Botón Admin discreto en el footer (visible solo si ya hubo login) */
   .footer-admin-link {
     margin-top: 1rem;
@@ -2260,16 +2290,8 @@
   <div class="cart-items" id="cartItems"></div>
   <div class="cart-footer">
     <div class="cart-total">
-      <span class="cart-total-label">Total (USD)</span>
+      <span class="cart-total-label">Total</span>
       <span class="cart-total-value" id="totalUSD">$0.00</span>
-    </div>
-    <div class="cart-total secundario">
-      <span class="cart-total-label">En COP</span>
-      <span class="cart-total-value" id="totalCOP">$0 COP</span>
-    </div>
-    <div class="cart-total secundario">
-      <span class="cart-total-label">En Bs</span>
-      <span class="cart-total-value" id="totalVES">0 Bs</span>
     </div>
     <button class="btn-checkout" id="btnCheckout" disabled>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
@@ -2397,24 +2419,41 @@
             <small style="display:block; margin-top:0.4rem; color: rgba(42, 36, 24, 0.55); font-size:0.75rem;">"Agotado" se marca solo si stock es 0. Marcá "próximamente" para esconder el botón comprar.</small>
           </div>
           <div class="form-group">
-            <label>Imagen principal (URL)</label>
-            <input type="text" id="prodImagen" placeholder="https://bellassc.store/fotos/...">
+            <label>Imagen principal</label>
+            <div class="img-input-wrap">
+              <input type="text" id="prodImagen" placeholder="URL o usa el botón Subir →">
+              <button type="button" class="btn-upload-img" data-img-slot="0">📤 Subir</button>
+            </div>
             <small id="prodImagenSuggest" style="display:none; margin-top:0.4rem; color: var(--dorado-claro); font-size:0.78rem; cursor:pointer;"></small>
+            <small class="img-upload-status" data-status-slot="0" style="display:none;"></small>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label>Imagen 2 (opcional)</label>
-              <input type="text" id="prodImagen2">
+              <div class="img-input-wrap">
+                <input type="text" id="prodImagen2">
+                <button type="button" class="btn-upload-img" data-img-slot="1">📤</button>
+              </div>
+              <small class="img-upload-status" data-status-slot="1" style="display:none;"></small>
             </div>
             <div class="form-group">
               <label>Imagen 3 (opcional)</label>
-              <input type="text" id="prodImagen3">
+              <div class="img-input-wrap">
+                <input type="text" id="prodImagen3">
+                <button type="button" class="btn-upload-img" data-img-slot="2">📤</button>
+              </div>
+              <small class="img-upload-status" data-status-slot="2" style="display:none;"></small>
             </div>
           </div>
           <div class="form-group">
             <label>Imagen 4 (opcional)</label>
-            <input type="text" id="prodImagen4">
+            <div class="img-input-wrap">
+              <input type="text" id="prodImagen4">
+              <button type="button" class="btn-upload-img" data-img-slot="3">📤</button>
+            </div>
+            <small class="img-upload-status" data-status-slot="3" style="display:none;"></small>
           </div>
+          <input type="file" id="prodImagenFile" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;">
           <div class="form-actions">
             <button class="btn-secondary" id="btnCancelarProducto">Cancelar</button>
             <button class="btn-primary" id="btnGuardarProducto">Guardar</button>
@@ -2426,16 +2465,6 @@
         <div class="form-group">
           <label>Número de WhatsApp (con código país, sin + ni espacios)</label>
           <input type="text" id="confWhatsapp" placeholder="584120664059">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Tasa USD → COP</label>
-            <input type="number" id="confTasaCOP" step="0.01" placeholder="4000">
-          </div>
-          <div class="form-group">
-            <label>Tasa USD → VES (Bolívares)</label>
-            <input type="number" id="confTasaVES" step="0.01" placeholder="479.77">
-          </div>
         </div>
         <div class="form-group">
           <label>Mensaje de bienvenida del pedido</label>
@@ -3427,10 +3456,7 @@ function renderProductos() {
           ${p.sku ? `<div class="producto-sku">${escapeHtml(p.sku)}</div>` : ''}
           <p class="producto-descripcion">${escapeHtml(p.descripcion || '')}</p>
           <div class="precios">
-            ${p.precio > 0
-              ? `<div class="precio-principal">${fmtUSD(p.precio)}</div>
-                 <div class="precio-secundario">${fmtCOP(p.precio)} · ${fmtVES(p.precio)}</div>`
-              : `<div class="precio-principal">Precio próximo</div>`}
+            <div class="precio-principal">${p.precio > 0 ? fmtUSD(p.precio) : 'Precio próximo'}</div>
           </div>
           <div class="producto-control-wrap">${controlHtml}</div>
         </div>
@@ -3602,8 +3628,6 @@ function actualizarCarrito() {
 
   const total = totalUSDCarrito();
   document.getElementById('totalUSD').textContent = fmtUSD(total);
-  document.getElementById('totalCOP').textContent = fmtCOP(total);
-  document.getElementById('totalVES').textContent = fmtVES(total);
   document.getElementById('btnCheckout').disabled = ids.length === 0;
 }
 
@@ -3624,7 +3648,6 @@ function generarMensajeWhatsapp() {
 
   lineas.push('');
   lineas.push(`*Total: ${fmtUSD(total)}*`);
-  lineas.push(`Equivalente: ${fmtCOP(total)} · ${fmtVES(total)}`);
   lineas.push('');
   lineas.push('¡Gracias! 🌸');
 
@@ -4105,6 +4128,13 @@ function abrirFormProducto(prod) {
   }
   actualizarSugerenciaImagen();
 
+  // Limpiar mensajes de estado de subidas anteriores
+  document.querySelectorAll('.img-upload-status').forEach(el => {
+    el.style.display = 'none';
+    el.className = 'img-upload-status';
+    el.textContent = '';
+  });
+
   document.getElementById('formProductoContainer').style.display = 'block';
   document.getElementById('prodNombre').focus();
   document.getElementById('formProductoContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -4212,8 +4242,6 @@ async function guardarProducto() {
 
 function cargarConfigEnForm() {
   document.getElementById('confWhatsapp').value = state.config.whatsapp;
-  document.getElementById('confTasaCOP').value = state.config.tasaCOP;
-  document.getElementById('confTasaVES').value = state.config.tasaVES;
   document.getElementById('confMensaje').value = state.config.mensaje;
   const gasUrlEl = document.getElementById('confGasUrl');
   if (gasUrlEl) gasUrlEl.value = localStorage.getItem(ADMIN_GAS_URL_KEY) || '(no configurada)';
@@ -4221,8 +4249,6 @@ function cargarConfigEnForm() {
 
 async function guardarConfig() {
   state.config.whatsapp = document.getElementById('confWhatsapp').value.trim().replace(/\D/g, '');
-  state.config.tasaCOP = parseFloat(document.getElementById('confTasaCOP').value) || 0;
-  state.config.tasaVES = parseFloat(document.getElementById('confTasaVES').value) || 0;
   state.config.mensaje = document.getElementById('confMensaje').value.trim() || defaultData.config.mensaje;
   guardarDatos();
   renderProductos();
@@ -4343,6 +4369,91 @@ document.getElementById('prodCategoria').onchange = () => {
 };
 document.getElementById('prodSku').oninput = actualizarSugerenciaImagen;
 document.getElementById('prodImagen').oninput = actualizarSugerenciaImagen;
+
+// === Subida de imágenes al repo de GitHub vía GAS ===
+// Slot activo (0-3): qué input de imagen disparó el file picker.
+state.uploadSlot = 0;
+
+document.querySelectorAll('.btn-upload-img').forEach(btn => {
+  btn.onclick = () => {
+    const sku = document.getElementById('prodSku').value.trim().toUpperCase();
+    const cat = document.getElementById('prodCategoria').value;
+    if (!sku || !/^[A-Z]{3}-\d{4}$/.test(sku)) {
+      mostrarToast('Llena primero el SKU del producto');
+      return;
+    }
+    if (!cat) {
+      mostrarToast('Selecciona una categoría');
+      return;
+    }
+    state.uploadSlot = parseInt(btn.dataset.imgSlot, 10);
+    document.getElementById('prodImagenFile').click();
+  };
+});
+
+document.getElementById('prodImagenFile').onchange = async (e) => {
+  const file = e.target.files[0];
+  e.target.value = ''; // permite re-subir el mismo archivo después
+  if (!file) return;
+
+  const slot = state.uploadSlot;
+  const inputId = slot === 0 ? 'prodImagen' : `prodImagen${slot + 1}`;
+  const statusEl = document.querySelector(`.img-upload-status[data-status-slot="${slot}"]`);
+  const sku = document.getElementById('prodSku').value.trim().toUpperCase();
+  const categoria = document.getElementById('prodCategoria').value;
+
+  // Validación de tamaño (máx 5MB para que GAS no se ahogue con el base64)
+  if (file.size > 5 * 1024 * 1024) {
+    statusEl.className = 'img-upload-status error';
+    statusEl.style.display = 'block';
+    statusEl.textContent = '❌ Imagen muy pesada (máx 5 MB). Comprímela primero.';
+    return;
+  }
+
+  // Determinar extensión a partir del nombre o tipo MIME
+  let ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (!['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
+    const mime = file.type || '';
+    if (mime.includes('jpeg')) ext = 'jpg';
+    else if (mime.includes('png')) ext = 'png';
+    else if (mime.includes('webp')) ext = 'webp';
+    else if (mime.includes('gif')) ext = 'gif';
+    else { mostrarToast('Formato no soportado'); return; }
+  }
+
+  statusEl.className = 'img-upload-status subiendo';
+  statusEl.style.display = 'block';
+  statusEl.textContent = `⏳ Subiendo ${file.name}...`;
+
+  try {
+    const base64 = await leerArchivoBase64(file);
+    const res = await gasCall('upload', {
+      categoria, sku, ext, slot,
+      content: base64
+    });
+    document.getElementById(inputId).value = res.url;
+    statusEl.className = 'img-upload-status ok';
+    statusEl.textContent = `✅ Subida (${res.replaced ? 'reemplazada' : 'nueva'}) — guarda el producto para registrar la URL`;
+    if (slot === 0) actualizarSugerenciaImagen();
+  } catch (err) {
+    statusEl.className = 'img-upload-status error';
+    statusEl.textContent = '❌ ' + err.message;
+  }
+};
+
+// Lee un File como base64 sin el prefijo data:...
+function leerArchivoBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const idx = dataUrl.indexOf(',');
+      resolve(idx >= 0 ? dataUrl.substring(idx + 1) : dataUrl);
+    };
+    reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
+    reader.readAsDataURL(file);
+  });
+}
 document.getElementById('btnExportar').onclick = exportar;
 document.getElementById('btnImportar').onclick = () => document.getElementById('importFile').click();
 document.getElementById('importFile').onchange = (e) => {
@@ -4486,9 +4597,7 @@ function abrirLightbox(producto) {
     sku.style.display = 'none';
   }
 
-  precio.innerHTML = producto.precio > 0
-    ? `${fmtUSD(producto.precio)}<span class="lightbox-separador">·</span>${fmtCOP(producto.precio)}<span class="lightbox-separador">·</span>${fmtVES(producto.precio)}`
-    : `Precio próximo`;
+  precio.innerHTML = producto.precio > 0 ? fmtUSD(producto.precio) : 'Precio próximo';
 
   // Marca "single-image" oculta flechas y dots cuando solo hay 1 imagen
   overlay.classList.toggle('single-image', imgs.length === 1);
