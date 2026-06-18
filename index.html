@@ -1257,6 +1257,58 @@
   .icon-btn:hover { border-color: var(--dorado); color: var(--dorado); }
   .icon-btn.danger:hover { border-color: #e57373; color: #e57373; }
 
+  /* Toolbar del admin (buscador + checkbox ver archivados) */
+  #adminToolbar { display: flex; }
+
+  /* Tag de estado dentro de la tarjeta admin (destacado, agotado, etc.) */
+  .admin-producto-tag {
+    display: inline-block;
+    padding: 0.12rem 0.45rem;
+    border-radius: 2px;
+    font-size: 0.66rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: 0.3rem;
+  }
+  .admin-producto-tag.destacado { background: rgba(139, 107, 46, 0.18); color: var(--dorado-oscuro); }
+  .admin-producto-tag.agotado { background: rgba(229, 115, 115, 0.15); color: #b94a3b; }
+  .admin-producto-tag.proximamente { background: rgba(232, 212, 168, 0.4); color: var(--dorado-oscuro); }
+  .admin-producto-tag.archivado { background: rgba(42, 36, 24, 0.15); color: rgba(42, 36, 24, 0.7); }
+  .admin-producto-tag.sin-stock { background: rgba(229, 115, 115, 0.1); color: #b94a3b; }
+
+  .admin-producto-item.es-archivado { opacity: 0.55; }
+
+  /* Checkboxes de estado en el form */
+  .estado-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.2rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--gris-borde);
+    border-radius: 2px;
+    background: var(--negro-suave);
+  }
+  .estado-checks label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: rgba(42, 36, 24, 0.85);
+    cursor: pointer;
+  }
+  .estado-checks input[type="checkbox"] {
+    accent-color: var(--dorado);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  /* Tabla admin con 3 columnas en desktop, stack en móvil */
+  @media (min-width: 768px) {
+    .admin-producto-meta { font-size: 0.78rem; }
+  }
+
   /* Footer */
   footer {
     background: var(--negro-suave);
@@ -2118,6 +2170,29 @@
       <button class="cart-close" id="adminClose">✕</button>
     </div>
     <div class="modal-body">
+
+      <!-- Pantalla de login: se muestra cuando no hay sesión admin activa -->
+      <div id="adminLoginScreen" style="display:none; padding: 1rem 0;">
+        <div style="background: rgba(201,162,77,0.08); border: 1px solid var(--gris-borde); padding: 1rem; border-radius: 2px; margin-bottom: 1.5rem; font-size: 0.85rem; color: rgba(42, 36, 24, 0.75);">
+          🔐 Ingresa la contraseña para administrar los productos. La primera vez también tenés que pegar la URL del backend (te la dieron al hacer el deploy del Apps Script).
+        </div>
+        <div class="form-group" id="loginGasUrlGroup">
+          <label>URL del backend (Apps Script Web App)</label>
+          <input type="text" id="loginGasUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+          <small style="display:block; margin-top:0.4rem; color: rgba(42, 36, 24, 0.55); font-size:0.75rem;">Solo se pide la primera vez. Queda guardada en este navegador.</small>
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="loginPassword" autocomplete="current-password">
+        </div>
+        <div id="loginError" style="display:none; padding: 0.6rem 0.8rem; background: rgba(229, 115, 115, 0.12); border: 1px solid rgba(229, 115, 115, 0.4); border-radius: 2px; color: #b94a3b; font-size: 0.85rem; margin-bottom: 1rem;"></div>
+        <div class="form-actions">
+          <button class="btn-primary" id="btnLoginAdmin">Entrar</button>
+        </div>
+      </div>
+
+      <!-- Contenido principal del admin (solo visible tras login si hay GAS configurado) -->
+      <div id="adminContent">
       <div class="modal-tabs">
         <button class="modal-tab active" data-tab="productos">Productos</button>
         <button class="modal-tab" data-tab="config">Configuración</button>
@@ -2126,42 +2201,84 @@
       <div class="tab-panel active" id="tabProductos">
         <div id="adminSheetStatus" style="padding: 0.75rem 1rem; background: rgba(201,162,77,0.08); border: 1px solid var(--gris-borde); border-radius: 2px; margin-bottom: 1rem; font-size: 0.85rem; color: rgba(42, 36, 24, 0.75);"></div>
 
+        <div id="adminToolbar" style="display:none; margin-bottom: 1rem; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+          <input type="text" id="adminBuscar" placeholder="🔎 Buscar por nombre o SKU..." style="flex: 1; min-width: 180px; padding: 0.55rem 0.8rem; border: 1px solid var(--gris-borde); border-radius: 2px; background: var(--negro-suave);">
+          <label style="display:flex; align-items:center; gap: 0.4rem; font-size: 0.8rem; color: rgba(42, 36, 24, 0.7); white-space: nowrap;">
+            <input type="checkbox" id="adminVerArchivados"> Ver archivados
+          </label>
+          <button class="btn-secondary" id="btnRefreshAdmin" title="Recargar desde el Sheet">🔄</button>
+        </div>
+
         <div id="adminProductosLista"></div>
 
         <div class="form-actions" id="btnNuevoContainer">
-          <button class="btn-primary" id="btnNuevoProducto">+ Nuevo producto (local)</button>
+          <button class="btn-primary" id="btnNuevoProducto">+ Nuevo producto</button>
         </div>
 
         <div id="formProductoContainer" style="display:none; margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--gris-borde);">
           <h3 style="font-family: var(--font-serif); margin-bottom: 1rem; color: var(--dorado-claro);" id="formProductoTitulo">Nuevo producto</h3>
-          <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" id="prodNombre" placeholder="Ej: Labial mate ruby">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre <span style="color:#b94a3b;">*</span></label>
+              <input type="text" id="prodNombre" placeholder="Ej: Labial mate ruby">
+            </div>
+            <div class="form-group">
+              <label>SKU</label>
+              <input type="text" id="prodSku" placeholder="Se autocompleta al elegir categoría" style="text-transform: uppercase;">
+            </div>
           </div>
           <div class="form-group">
             <label>Descripción</label>
-            <textarea id="prodDescripcion" placeholder="Breve descripción del producto"></textarea>
+            <textarea id="prodDescripcion" placeholder="Breve descripción del producto (1-2 líneas)"></textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Categoría</label>
+              <label>Categoría <span style="color:#b94a3b;">*</span></label>
               <select id="prodCategoria">
                 <option value="Maquillaje">Maquillaje</option>
-                <option value="Cuidado de la piel">Cuidado de la piel</option>
-                <option value="Accesorios">Accesorios</option>
+                <option value="Skin Care">Skin Care</option>
                 <option value="Cabello">Cabello</option>
-                <option value="Perfumería">Perfumería</option>
-                <option value="Uñas">Uñas</option>
+                <option value="Accesorios">Accesorios</option>
+                <option value="Perfume">Perfume</option>
+                <option value="Vestimenta">Vestimenta</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Precio en USD</label>
+              <label>Precio USD <span style="color:#b94a3b;">*</span></label>
               <input type="number" id="prodPrecio" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <div class="form-group">
+              <label>Stock <span style="color:#b94a3b;">*</span></label>
+              <input type="number" id="prodCantidad" min="0" step="1" placeholder="0">
             </div>
           </div>
           <div class="form-group">
-            <label>URL de imagen (opcional)</label>
-            <input type="text" id="prodImagen" placeholder="https://... o deja vacío para usar placeholder">
+            <label>Estado</label>
+            <div class="estado-checks">
+              <label><input type="checkbox" id="estadoDestacado"> ✨ Destacado</label>
+              <label><input type="checkbox" id="estadoAgotado"> Agotado</label>
+              <label><input type="checkbox" id="estadoProximamente"> Próximamente</label>
+            </div>
+            <small style="display:block; margin-top:0.4rem; color: rgba(42, 36, 24, 0.55); font-size:0.75rem;">"Agotado" se marca solo si stock es 0. Marcá "próximamente" para esconder el botón comprar.</small>
+          </div>
+          <div class="form-group">
+            <label>Imagen principal (URL)</label>
+            <input type="text" id="prodImagen" placeholder="https://bellassc.store/fotos/...">
+            <small id="prodImagenSuggest" style="display:none; margin-top:0.4rem; color: var(--dorado-claro); font-size:0.78rem; cursor:pointer;"></small>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Imagen 2 (opcional)</label>
+              <input type="text" id="prodImagen2">
+            </div>
+            <div class="form-group">
+              <label>Imagen 3 (opcional)</label>
+              <input type="text" id="prodImagen3">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Imagen 4 (opcional)</label>
+            <input type="text" id="prodImagen4">
           </div>
           <div class="form-actions">
             <button class="btn-secondary" id="btnCancelarProducto">Cancelar</button>
@@ -2171,13 +2288,6 @@
       </div>
 
       <div class="tab-panel" id="tabConfig">
-        <div class="form-group">
-          <label>Google Sheet conectado</label>
-          <input type="text" id="confSheetUrl" readonly style="opacity:0.7; cursor:not-allowed;">
-          <small style="display:block; margin-top:0.4rem; color: rgba(42, 36, 24, 0.5); font-size:0.75rem; line-height:1.5;">
-            📎 Esta URL está fija en el código del sitio. Para cambiarla hay que editar el archivo HTML. Para editar los productos usa Google Sheets directamente.
-          </small>
-        </div>
         <div class="form-group">
           <label>Número de WhatsApp (con código país, sin + ni espacios)</label>
           <input type="text" id="confWhatsapp" placeholder="584120664059">
@@ -2198,19 +2308,23 @@
         </div>
         <div class="form-actions">
           <button class="btn-primary" id="btnGuardarConfig">Guardar configuración</button>
-          <button class="btn-secondary" id="btnRecargarSheet">🔄 Recargar desde Sheet</button>
+          <button class="btn-secondary" id="btnRecargarSheet">🔄 Recargar catálogo público</button>
         </div>
 
         <div style="margin-top:2rem; padding-top:1.5rem; border-top: 1px solid var(--gris-borde);">
-          <h3 style="font-family: var(--font-serif); color: var(--dorado-claro); margin-bottom: 0.75rem; font-size: 1.2rem;">✨ Cómo editar los productos</h3>
-          <p style="color: rgba(42, 36, 24, 0.7); font-size: 0.85rem; line-height: 1.6;">
-            Los productos se editan directamente en tu Google Sheet. Abre la hoja desde tu celular o PC, agrega/modifica/elimina filas, guarda los cambios y espera ~5 min para que Google los propague. Luego usa el botón <b>"🔄 Recargar desde Sheet"</b> arriba para ver los cambios al instante.
+          <h3 style="font-family: var(--font-serif); color: var(--dorado-claro); margin-bottom: 0.75rem; font-size: 1.1rem;">🔐 Sesión de administración</h3>
+          <p style="color: rgba(42, 36, 24, 0.7); font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.6rem;">
+            URL del backend admin (Apps Script):
           </p>
+          <input type="text" id="confGasUrl" readonly style="width: 100%; padding: 0.55rem 0.8rem; border: 1px solid var(--gris-borde); border-radius: 2px; background: var(--negro-suave); opacity: 0.75; cursor: not-allowed; font-family: monospace; font-size: 0.78rem;">
+          <div class="form-actions" style="margin-top: 0.8rem;">
+            <button class="btn-secondary" id="btnLogoutAdmin">Cerrar sesión y olvidar credenciales</button>
+          </div>
         </div>
 
         <div style="margin-top:1.5rem; padding-top:1rem; border-top: 1px solid var(--gris-borde);">
           <p style="color: rgba(42, 36, 24, 0.5); font-size: 0.8rem; line-height: 1.5; margin-bottom:0.5rem;">
-            Respaldo local (si no quieres usar Sheets):
+            Respaldo local (export/import del cache):
           </p>
           <div class="form-actions" style="margin-top: 0.5rem;">
             <button class="btn-secondary" id="btnExportar">Exportar datos</button>
@@ -2219,6 +2333,7 @@
           </div>
         </div>
       </div>
+      </div><!-- /#adminContent -->
     </div>
   </div>
 </div>
@@ -2723,6 +2838,11 @@ function filasAProductos(rows) {
     // Es case-insensitive y acepta varios estados combinados separados por guiones,
     // comas, espacios o barras (ej: "destacado-agotado", "destacado agotado").
     const estadoRaw = idxEstado >= 0 ? norm(fila[idxEstado] || '') : '';
+
+    // 'archivado' = soft delete desde el panel admin. No se muestra en el catálogo
+    // público, pero la fila queda en el Sheet para no romper links ?p=N.
+    if (estadoRaw.includes('archivado')) continue;
+
     let agotado = estadoRaw.includes('agotado');
     const proximamente = estadoRaw.includes('proximamente') || precioFaltante;
     const destacado = estadoRaw.includes('destacado');
@@ -3435,138 +3555,390 @@ function escapeHtml(str) {
 }
 
 // ===== ADMIN =====
+// El admin habla con un backend de Google Apps Script (ver apps-script/Code.gs)
+// que lee/escribe directamente al Google Sheet. La URL y la contraseña se
+// guardan en localStorage tras el primer login. Sin esa configuración el panel
+// muestra una pantalla de login.
+
+const ADMIN_GAS_URL_KEY  = 'bellas_admin_gas_url_v1';
+const ADMIN_PASSWORD_KEY = 'bellas_admin_password_v1';
+
+// Estado del admin (separado del catálogo público para evitar contaminarse).
+state.adminProductos = [];      // lista completa desde GAS (incluye archivados)
+state.adminBusqueda = '';
+state.adminVerArchivados = false;
+state.adminLoggedIn = false;
+
+// Llamada genérica al backend. Usa text/plain para evitar preflight CORS.
+async function gasCall(action, extra) {
+  const url = localStorage.getItem(ADMIN_GAS_URL_KEY);
+  const password = localStorage.getItem(ADMIN_PASSWORD_KEY);
+  if (!url || !password) throw new Error('Falta configurar URL o contraseña');
+
+  const body = Object.assign({ action, password }, extra || {});
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(body),
+    redirect: 'follow'
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  if (data.ok === false) throw new Error(data.error || 'Error del servidor');
+  return data;
+}
+
 function abrirAdmin() {
   document.getElementById('adminModal').classList.add('open');
-  renderAdminProductos();
   cargarConfigEnForm();
+
+  const url = localStorage.getItem(ADMIN_GAS_URL_KEY);
+  const password = localStorage.getItem(ADMIN_PASSWORD_KEY);
+  if (url && password) {
+    // Ya hay credenciales guardadas → intentar cargar; si falla, mostrar login.
+    state.adminLoggedIn = true;
+    mostrarContenidoAdmin();
+    cargarAdminProductos();
+  } else {
+    mostrarLoginAdmin();
+  }
 }
+
 function cerrarAdmin() {
   document.getElementById('adminModal').classList.remove('open');
   document.getElementById('formProductoContainer').style.display = 'none';
+  document.getElementById('loginError').style.display = 'none';
   state.editandoId = null;
+}
+
+function mostrarLoginAdmin() {
+  document.getElementById('adminLoginScreen').style.display = 'block';
+  document.getElementById('adminContent').style.display = 'none';
+  // Si ya hay URL guardada, ocultamos el campo URL (solo pedimos password).
+  const urlGuardada = localStorage.getItem(ADMIN_GAS_URL_KEY) || '';
+  document.getElementById('loginGasUrl').value = urlGuardada;
+  document.getElementById('loginGasUrlGroup').style.display = urlGuardada ? 'none' : 'block';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginPassword').focus();
+}
+
+function mostrarContenidoAdmin() {
+  document.getElementById('adminLoginScreen').style.display = 'none';
+  document.getElementById('adminContent').style.display = 'block';
+}
+
+async function adminLogin() {
+  const url = document.getElementById('loginGasUrl').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errorEl = document.getElementById('loginError');
+  errorEl.style.display = 'none';
+
+  if (!url || !password) {
+    errorEl.textContent = 'Llená URL y contraseña.';
+    errorEl.style.display = 'block';
+    return;
+  }
+  if (!/^https:\/\/script\.google\.com\//.test(url)) {
+    errorEl.textContent = 'La URL debe empezar con https://script.google.com/';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  // Guardamos primero para que gasCall las use, las borramos si falla.
+  localStorage.setItem(ADMIN_GAS_URL_KEY, url);
+  localStorage.setItem(ADMIN_PASSWORD_KEY, password);
+
+  const btn = document.getElementById('btnLoginAdmin');
+  btn.disabled = true; btn.textContent = 'Verificando...';
+  try {
+    await gasCall('list');
+    state.adminLoggedIn = true;
+    mostrarContenidoAdmin();
+    cargarAdminProductos();
+    cargarConfigEnForm();
+    mostrarToast('Sesión iniciada ✨');
+  } catch (err) {
+    // Credenciales inválidas o backend caído → limpiamos lo que guardamos.
+    localStorage.removeItem(ADMIN_PASSWORD_KEY);
+    errorEl.textContent = '❌ ' + (err.message || 'No se pudo conectar');
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
+
+function adminLogout() {
+  if (!confirm('¿Cerrar sesión y olvidar la URL y contraseña en este navegador?')) return;
+  localStorage.removeItem(ADMIN_GAS_URL_KEY);
+  localStorage.removeItem(ADMIN_PASSWORD_KEY);
+  state.adminLoggedIn = false;
+  state.adminProductos = [];
+  mostrarLoginAdmin();
+  mostrarToast('Sesión cerrada');
+}
+
+async function cargarAdminProductos() {
+  const cont = document.getElementById('adminProductosLista');
+  cont.innerHTML = '<p style="text-align:center; padding: 2rem 0; color: rgba(42, 36, 24, 0.5);">Cargando productos...</p>';
+  try {
+    const data = await gasCall('list');
+    state.adminProductos = data.productos || [];
+    renderAdminProductos();
+  } catch (err) {
+    cont.innerHTML = `<p style="text-align:center; padding: 2rem 0; color: #b94a3b;">❌ ${escapeHtml(err.message)}</p>`;
+    if (/password/i.test(err.message)) {
+      adminLogout();
+    }
+  }
 }
 
 function renderAdminProductos() {
   const cont = document.getElementById('adminProductosLista');
   const statusEl = document.getElementById('adminSheetStatus');
-  const btnNuevo = document.getElementById('btnNuevoContainer');
+  const toolbar = document.getElementById('adminToolbar');
 
-  // Mostrar estado según la fuente
-  if (state.fuenteDatos === 'sheet') {
-    statusEl.innerHTML = `✅ <b>Conectado a Google Sheets</b> — Edita los productos directamente en tu hoja. Los cambios aparecerán aquí al recargar.`;
-    statusEl.style.borderColor = 'rgba(37, 211, 102, 0.4)';
-    statusEl.style.background = 'rgba(37, 211, 102, 0.08)';
-    btnNuevo.style.display = 'none';
-  } else if (state.config.sheetUrl) {
-    statusEl.innerHTML = `⚠️ <b>Sheet configurado pero no se pudo cargar</b> — Revisa la URL en la pestaña Configuración y asegúrate de que esté publicado como CSV.`;
-    statusEl.style.borderColor = 'rgba(229, 115, 115, 0.4)';
-    statusEl.style.background = 'rgba(229, 115, 115, 0.08)';
-    btnNuevo.style.display = 'flex';
-  } else {
-    statusEl.innerHTML = `📁 <b>Modo local</b> — Los productos se guardan en este navegador. Para sincronizar con tu tienda, conecta un Google Sheet en la pestaña Configuración.`;
-    statusEl.style.borderColor = 'var(--gris-borde)';
-    statusEl.style.background = 'rgba(201,162,77,0.08)';
-    btnNuevo.style.display = 'flex';
+  statusEl.innerHTML = `✅ <b>Conectado al Google Sheet</b> vía panel admin. Los cambios se guardan al instante. El catálogo público se actualiza en ~1-5 min (Google cachea el CSV).`;
+  statusEl.style.borderColor = 'rgba(37, 211, 102, 0.4)';
+  statusEl.style.background = 'rgba(37, 211, 102, 0.08)';
+  toolbar.style.display = 'flex';
+
+  const q = (state.adminBusqueda || '').toLowerCase().trim();
+  let lista = state.adminProductos.slice();
+
+  // Filtro: archivado (oculto por defecto)
+  if (!state.adminVerArchivados) {
+    lista = lista.filter(p => !/archivado/i.test(p.estado || ''));
+  }
+  // Filtro: búsqueda por nombre o SKU
+  if (q) {
+    lista = lista.filter(p =>
+      (p.nombre || '').toLowerCase().includes(q) ||
+      (p.sku || '').toLowerCase().includes(q)
+    );
   }
 
-  if (state.productos.length === 0) {
-    cont.innerHTML = '<p style="color: rgba(42, 36, 24, 0.5); text-align:center; padding: 2rem 0;">Aún no hay productos.</p>';
+  if (lista.length === 0) {
+    cont.innerHTML = '<p style="text-align:center; padding: 2rem 0; color: rgba(42, 36, 24, 0.5);">No hay productos que coincidan.</p>';
     return;
   }
 
-  const esSheet = state.fuenteDatos === 'sheet';
-  cont.innerHTML = state.productos.map(p => `
-    <div class="admin-producto-item">
-      <div class="admin-producto-info">
-        <div class="admin-producto-nombre">${escapeHtml(p.nombre)}</div>
-        <div class="admin-producto-meta">${escapeHtml(p.categoria)} · ${fmtUSD(p.precio)}</div>
-      </div>
-      ${esSheet ? '' : `
+  cont.innerHTML = lista.map(p => {
+    const estadoRaw = (p.estado || '').toLowerCase();
+    const esArchivado = /archivado/.test(estadoRaw);
+    const cantidad = String(p.cantidad || '').trim();
+    const sinStock = cantidad === '' || parseInt(cantidad, 10) === 0;
+
+    // Tags visibles en la card
+    const tags = [];
+    if (esArchivado) tags.push('<span class="admin-producto-tag archivado">archivado</span>');
+    if (/destacado/.test(estadoRaw)) tags.push('<span class="admin-producto-tag destacado">✨ destacado</span>');
+    if (/agotado/.test(estadoRaw))    tags.push('<span class="admin-producto-tag agotado">agotado</span>');
+    if (/proximamente/.test(estadoRaw)) tags.push('<span class="admin-producto-tag proximamente">próximo</span>');
+    if (sinStock && !esArchivado)     tags.push('<span class="admin-producto-tag sin-stock">sin stock</span>');
+
+    const precio = p.precio ? `$${String(p.precio).replace(',', '.')}` : '—';
+    const stockTxt = cantidad === '' ? 'sin stock cargado' : `Stock: ${cantidad}`;
+    const sku = p.sku ? `<code style="font-size:0.7rem;">${escapeHtml(p.sku)}</code>` : '';
+
+    return `
+      <div class="admin-producto-item ${esArchivado ? 'es-archivado' : ''}">
+        <div class="admin-producto-info">
+          <div class="admin-producto-nombre">${escapeHtml(p.nombre)} ${sku}</div>
+          <div class="admin-producto-meta">${escapeHtml(p.categoria || 'sin categoría')} · ${precio} · ${stockTxt}</div>
+          ${tags.length ? `<div style="margin-top:0.3rem;">${tags.join('')}</div>` : ''}
+        </div>
         <div class="admin-producto-actions">
           <button class="icon-btn" data-edit="${p.id}" title="Editar">✎</button>
-          <button class="icon-btn danger" data-del="${p.id}" title="Eliminar">🗑</button>
+          ${esArchivado ? '' : `<button class="icon-btn danger" data-arch="${p.id}" title="Archivar (no borra, solo oculta)">🗄</button>`}
         </div>
-      `}
-    </div>
-  `).join('');
+      </div>
+    `;
+  }).join('');
 
-  if (!esSheet) {
-    cont.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editarProducto(parseInt(b.dataset.edit)));
-    cont.querySelectorAll('[data-del]').forEach(b => b.onclick = () => eliminarProducto(parseInt(b.dataset.del)));
-  }
+  cont.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editarProducto(parseInt(b.dataset.edit)));
+  cont.querySelectorAll('[data-arch]').forEach(b => b.onclick = () => archivarProducto(parseInt(b.dataset.arch)));
+}
+
+// Slugs de categoría para construir paths de fotos (fotos/<slug>/<SKU>.jpg)
+const CATEGORIA_SLUGS = {
+  'Maquillaje': 'maquillaje',
+  'Skin Care':  'skin-care',
+  'Cabello':    'cabello',
+  'Accesorios': 'accesorios',
+  'Perfume':    'perfume',
+  'Vestimenta': 'vestimenta'
+};
+// Prefijos de SKU por categoría
+const CATEGORIA_PREFIJOS = {
+  'Maquillaje': 'MAQ',
+  'Skin Care':  'SKI',
+  'Cabello':    'CAB',
+  'Accesorios': 'ACC',
+  'Perfume':    'PER',
+  'Vestimenta': 'VES'
+};
+
+// Genera el siguiente SKU disponible para la categoría dada,
+// basado en lo que ya existe en state.adminProductos.
+function generarSiguienteSku(categoria) {
+  const prefijo = CATEGORIA_PREFIJOS[categoria];
+  if (!prefijo) return '';
+  let max = 0;
+  state.adminProductos.forEach(p => {
+    const m = String(p.sku || '').match(new RegExp('^' + prefijo + '-(\\d+)$', 'i'));
+    if (m) {
+      const n = parseInt(m[1], 10);
+      if (n > max) max = n;
+    }
+  });
+  return `${prefijo}-${String(max + 1).padStart(4, '0')}`;
+}
+
+// Sugerencia de URL de imagen basada en SKU + categoría
+function sugerirUrlImagen(sku, categoria) {
+  const slug = CATEGORIA_SLUGS[categoria];
+  if (!slug || !sku) return '';
+  return `https://bellassc.store/fotos/${slug}/${sku}.jpg`;
 }
 
 function abrirFormProducto(prod) {
   state.editandoId = prod ? prod.id : null;
   document.getElementById('formProductoTitulo').textContent = prod ? 'Editar producto' : 'Nuevo producto';
-  document.getElementById('prodNombre').value = prod ? prod.nombre : '';
+  document.getElementById('prodNombre').value      = prod ? prod.nombre : '';
+  document.getElementById('prodSku').value         = prod ? (prod.sku || '') : '';
   document.getElementById('prodDescripcion').value = prod ? (prod.descripcion || '') : '';
-  document.getElementById('prodCategoria').value = prod ? prod.categoria : 'Maquillaje';
-  document.getElementById('prodPrecio').value = prod ? prod.precio : '';
-  document.getElementById('prodImagen').value = prod ? (prod.imagen || '') : '';
+  document.getElementById('prodCategoria').value   = prod && CATEGORIA_PREFIJOS[prod.categoria] ? prod.categoria : 'Maquillaje';
+  document.getElementById('prodPrecio').value      = prod ? String(prod.precio || '').replace(',', '.') : '';
+  document.getElementById('prodCantidad').value    = prod ? (prod.cantidad || '') : '';
+
+  const estadoRaw = prod ? (prod.estado || '').toLowerCase() : '';
+  document.getElementById('estadoDestacado').checked    = /destacado/.test(estadoRaw);
+  document.getElementById('estadoAgotado').checked      = /agotado/.test(estadoRaw);
+  document.getElementById('estadoProximamente').checked = /proximamente/.test(estadoRaw);
+
+  document.getElementById('prodImagen').value  = prod ? (prod.imagen  || '') : '';
+  document.getElementById('prodImagen2').value = prod ? (prod.imagen2 || '') : '';
+  document.getElementById('prodImagen3').value = prod ? (prod.imagen3 || '') : '';
+  document.getElementById('prodImagen4').value = prod ? (prod.imagen4 || '') : '';
+
+  // Si es nuevo, autocompletar SKU según categoría
+  if (!prod) {
+    document.getElementById('prodSku').value = generarSiguienteSku('Maquillaje');
+  }
+  actualizarSugerenciaImagen();
+
   document.getElementById('formProductoContainer').style.display = 'block';
   document.getElementById('prodNombre').focus();
+  document.getElementById('formProductoContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Muestra debajo del campo imagen una sugerencia clicable con la URL
+// esperada según el SKU + categoría.
+function actualizarSugerenciaImagen() {
+  const sku = document.getElementById('prodSku').value.trim().toUpperCase();
+  const cat = document.getElementById('prodCategoria').value;
+  const sugerida = sugerirUrlImagen(sku, cat);
+  const sug = document.getElementById('prodImagenSuggest');
+  const actual = document.getElementById('prodImagen').value.trim();
+  if (sugerida && sugerida !== actual) {
+    sug.textContent = `↪ Usar: ${sugerida}`;
+    sug.style.display = 'block';
+    sug.onclick = () => {
+      document.getElementById('prodImagen').value = sugerida;
+      sug.style.display = 'none';
+    };
+  } else {
+    sug.style.display = 'none';
+  }
 }
 
 function editarProducto(id) {
-  const p = state.productos.find(x => x.id === id);
+  const p = state.adminProductos.find(x => x.id === id);
   if (p) abrirFormProducto(p);
 }
 
-function eliminarProducto(id) {
-  const p = state.productos.find(x => x.id === id);
+async function archivarProducto(id) {
+  const p = state.adminProductos.find(x => x.id === id);
   if (!p) return;
-  if (!confirm(`¿Eliminar "${p.nombre}"?`)) return;
-  state.productos = state.productos.filter(x => x.id !== id);
-  delete state.carrito[id];
-  guardarDatos();
-  renderAdminProductos();
-  renderFiltros();
-  renderProductos();
-  actualizarCarrito();
-  mostrarToast('Producto eliminado');
+  if (!confirm(`¿Archivar "${p.nombre}"?\n\nLa fila queda en el Sheet (no se borra) pero deja de mostrarse en el sitio. Podés desarchivar luego desde "Ver archivados".`)) return;
+  try {
+    await gasCall('archive', { id });
+    mostrarToast('Producto archivado');
+    cargarAdminProductos();
+  } catch (err) {
+    alert('Error al archivar: ' + err.message);
+  }
 }
 
-function guardarProducto() {
+async function guardarProducto() {
   const nombre = document.getElementById('prodNombre').value.trim();
-  const descripcion = document.getElementById('prodDescripcion').value.trim();
+  const sku    = document.getElementById('prodSku').value.trim().toUpperCase();
+  const desc   = document.getElementById('prodDescripcion').value.trim();
   const categoria = document.getElementById('prodCategoria').value;
-  const precio = parseFloat(document.getElementById('prodPrecio').value);
-  const imagen = document.getElementById('prodImagen').value.trim();
+  const precioStr = document.getElementById('prodPrecio').value.trim();
+  const cantidadStr = document.getElementById('prodCantidad').value.trim();
 
   if (!nombre) { alert('El nombre es obligatorio'); return; }
+  const precio = parseFloat(precioStr.replace(',', '.'));
   if (isNaN(precio) || precio < 0) { alert('Precio inválido'); return; }
+  const cantidad = parseInt(cantidadStr, 10);
+  if (isNaN(cantidad) || cantidad < 0) { alert('Stock inválido — escribí 0 si no hay disponible'); return; }
 
+  // Construir string de estado a partir de los checkboxes.
+  // Si stock = 0, marcamos automáticamente "agotado".
+  const estados = [];
+  if (document.getElementById('estadoDestacado').checked)    estados.push('destacado');
+  if (document.getElementById('estadoAgotado').checked || cantidad === 0) estados.push('agotado');
+  if (document.getElementById('estadoProximamente').checked) estados.push('proximamente');
+  // Si estamos editando un archivado y NO cambiamos el flag, lo preservamos
+  // (en v1 no exponemos el toggle "archivado" en el form — para desarchivar
+  // hay que ser explícito desde el listado).
   if (state.editandoId) {
-    const p = state.productos.find(x => x.id === state.editandoId);
-    if (p) {
-      p.nombre = nombre;
-      p.descripcion = descripcion;
-      p.categoria = categoria;
-      p.precio = precio;
-      p.imagen = imagen;
-    }
-  } else {
-    const nuevoId = Math.max(0, ...state.productos.map(p => p.id)) + 1;
-    state.productos.push({ id: nuevoId, nombre, descripcion, categoria, precio, imagen });
+    const prev = state.adminProductos.find(x => x.id === state.editandoId);
+    if (prev && /archivado/i.test(prev.estado || '')) estados.push('archivado');
   }
 
-  state.editandoId = null;
-  guardarDatos();
-  document.getElementById('formProductoContainer').style.display = 'none';
-  renderAdminProductos();
-  renderFiltros();
-  renderProductos();
-  actualizarCarrito();
-  mostrarToast('Producto guardado ✨');
+  const producto = {
+    nombre,
+    descripcion: desc,
+    categoria,
+    precio: String(precio),
+    cantidad: String(cantidad),
+    estado: estados.join('-'),
+    sku,
+    imagen:  document.getElementById('prodImagen').value.trim(),
+    imagen2: document.getElementById('prodImagen2').value.trim(),
+    imagen3: document.getElementById('prodImagen3').value.trim(),
+    imagen4: document.getElementById('prodImagen4').value.trim()
+  };
+
+  const btn = document.getElementById('btnGuardarProducto');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  try {
+    if (state.editandoId) {
+      await gasCall('update', { id: state.editandoId, producto });
+      mostrarToast('Producto actualizado ✨');
+    } else {
+      await gasCall('create', { producto });
+      mostrarToast('Producto creado ✨');
+    }
+    state.editandoId = null;
+    document.getElementById('formProductoContainer').style.display = 'none';
+    cargarAdminProductos();
+  } catch (err) {
+    alert('Error al guardar: ' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar';
+  }
 }
 
 function cargarConfigEnForm() {
-  document.getElementById('confSheetUrl').value = state.config.sheetUrl || '';
   document.getElementById('confWhatsapp').value = state.config.whatsapp;
   document.getElementById('confTasaCOP').value = state.config.tasaCOP;
   document.getElementById('confTasaVES').value = state.config.tasaVES;
   document.getElementById('confMensaje').value = state.config.mensaje;
+  const gasUrlEl = document.getElementById('confGasUrl');
+  if (gasUrlEl) gasUrlEl.value = localStorage.getItem(ADMIN_GAS_URL_KEY) || '(no configurada)';
 }
 
 async function guardarConfig() {
@@ -3642,20 +4014,45 @@ document.getElementById('btnCancelarProducto').onclick = () => {
 document.getElementById('btnGuardarProducto').onclick = guardarProducto;
 document.getElementById('btnGuardarConfig').onclick = guardarConfig;
 document.getElementById('btnRecargarSheet').onclick = async () => {
-  if (!state.config.sheetUrl) {
-    mostrarToast('⚠️ Primero pega la URL del Sheet y guarda');
-    return;
-  }
-  mostrarToast('🔄 Recargando...');
+  mostrarToast('🔄 Recargando catálogo público...');
   const ok = await cargarProductosDesdeSheet();
   if (ok) {
     renderFiltros();
     inicializarFiltroPrecio();
     renderProductos();
     actualizarCarrito();
-    renderAdminProductos();
+    mostrarToast('Catálogo actualizado ✨');
   }
 };
+
+// === Login admin ===
+document.getElementById('btnLoginAdmin').onclick = adminLogin;
+document.getElementById('loginPassword').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') adminLogin();
+});
+document.getElementById('btnLogoutAdmin').onclick = adminLogout;
+
+// === Toolbar admin (buscar + ver archivados + refresh) ===
+document.getElementById('adminBuscar').oninput = (e) => {
+  state.adminBusqueda = e.target.value;
+  renderAdminProductos();
+};
+document.getElementById('adminVerArchivados').onchange = (e) => {
+  state.adminVerArchivados = e.target.checked;
+  renderAdminProductos();
+};
+document.getElementById('btnRefreshAdmin').onclick = () => cargarAdminProductos();
+
+// === Form producto: autocompletar SKU y sugerencia de URL ===
+document.getElementById('prodCategoria').onchange = () => {
+  if (!state.editandoId) {
+    // Solo regeneramos SKU automáticamente al crear (no al editar uno existente)
+    document.getElementById('prodSku').value = generarSiguienteSku(document.getElementById('prodCategoria').value);
+  }
+  actualizarSugerenciaImagen();
+};
+document.getElementById('prodSku').oninput = actualizarSugerenciaImagen;
+document.getElementById('prodImagen').oninput = actualizarSugerenciaImagen;
 document.getElementById('btnExportar').onclick = exportar;
 document.getElementById('btnImportar').onclick = () => document.getElementById('importFile').click();
 document.getElementById('importFile').onchange = (e) => {
